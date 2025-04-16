@@ -1,0 +1,2 @@
+@Entyti()
+export class User {}
