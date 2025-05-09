@@ -15,7 +15,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm run start:prod
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "npm", "run", "start:prod"]
 
   postgres:
     image: postgres:15
