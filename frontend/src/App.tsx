@@ -1,10 +1,10 @@
+import InventoryPage from './pages/InventoryPage';
 import Login from './Login';
-import 'react';
-
 const App = () => {
   return (
     <div className="app">
-      <Login />
+    <Login/>
+     {/*<InventoryPage />/*/} 
     </div>
   );
 };
