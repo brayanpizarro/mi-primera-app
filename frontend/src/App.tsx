@@ -1,10 +1,9 @@
-import Login from './Login';
-import 'react';
+import InventoryPage from './pages/InventoryPage';
 
 const App = () => {
   return (
     <div className="app">
-      <Login />
+      <InventoryPage />
     </div>
   );
 };
