@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsEmail, IsEnum, IsString, min, MinLength } from "class-validator";
+import { IsEmail, IsEnum, IsString, Matches, min, MinLength } from "class-validator";
 import { UserRole } from "src/users/entities/user-role.enum";
 
 export class RegisterDto{
@@ -18,5 +18,12 @@ export class RegisterDto{
 
     @IsEnum(UserRole) // Enum para los roles de usuario
     role: UserRole; // Rol del usuario (ejemplo: 'admin', 'user', etc.)
+
+    @Transform(({ value }) => value.trim().toUpperCase())
+    @IsString()
+    @Matches(/^(\d{1,2}\.?\d{3}\.?\d{3}-[\dkK])$/, {
+        message: 'El RUT debe tener un formato válido (Ej: 12.345.678-9)',
+    })
+    rut: string;
 
 }

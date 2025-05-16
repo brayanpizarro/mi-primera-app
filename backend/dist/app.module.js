@@ -8,10 +8,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
+const typeorm_1 = require("@nestjs/typeorm");
 const users_module_1 = require("./users/users.module");
-const inventory_module_1 = require("./inventory/inventory.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -21,17 +21,19 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
-                host: process.env.DB_HOST,
-                port: Number(process.env.DB_PORT),
-                username: process.env.DB_USERNAME,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
-                entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                host: process.env.DB_HOST || 'localhost',
+                port: parseInt(process.env.DB_PORT || '5433'),
+                username: process.env.DB_USER || 'postgres',
+                password: process.env.DB_PASSWORD || 'postgres',
+                database: process.env.DB_NAME || 'mi_basedatos',
+                autoLoadEntities: true,
                 synchronize: true,
             }),
             users_module_1.UsersModule,
-            inventory_module_1.InventoryModule,
+            auth_module_1.AuthModule,
         ],
+        controllers: [],
+        providers: [],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

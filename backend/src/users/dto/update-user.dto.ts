@@ -13,6 +13,10 @@ export class UpdateUserDto {
     
     @IsString()
     @IsOptional()
+    rut?: string; // Rut del usuario
+
+    @IsString()
+    @IsOptional()
     password?: string; // Contraseña del usuario
     
     @IsEnum(UserRole)

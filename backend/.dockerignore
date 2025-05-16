@@ -1,0 +1,10 @@
+node_modules
+dist
+test
+Dockerfile
+docker-compose.yml
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.git
+.gitignore

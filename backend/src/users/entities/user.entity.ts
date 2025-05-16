@@ -16,6 +16,9 @@ import {
   
     @Column()
     name: string;
+
+    @Column()
+    rut: string;
   
     @Column()
     email: string;

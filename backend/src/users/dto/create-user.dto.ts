@@ -9,6 +9,9 @@ export class CreateUserDto {
     name: string; // Nombre del usuario
 
     @IsString()
+    rut: string; // Rut del usuario unico
+
+    @IsString()
     email: string; // Correo electrónico del usuario
 
     @IsString()

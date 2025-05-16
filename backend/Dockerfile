@@ -1,23 +1,18 @@
-# Imagen base oficial de Node.js
-FROM node:17
+FROM node:18
 
-# Directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copiar solo package.json y lock para instalar deps primero (mejora cache)
-COPY package*.json ./
+# Instala pnpm globalmente
+RUN npm install -g pnpm
 
-# Instalar dependencias
-RUN npm install
+COPY package*.json pnpm*-lock.yaml ./
 
-# Copiar el resto del proyecto al contenedor
+RUN pnpm install
+
 COPY . .
 
-# Compilar el código TypeScript a JavaScript
-RUN npm run build
+RUN pnpm run build
 
-# Exponer el puerto que usa tu NestJS (por defecto 3000)
 EXPOSE 3000
 
-# Comando para ejecutar en producción
-CMD ["npm", "run", "start:prod"]
+CMD ["pnpm", "run", "start:dev"]

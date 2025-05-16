@@ -16,7 +16,7 @@ export class AuthService {
     ) { } 
 
     async register(registerDto:RegisterDto) { // Método para registrar un nuevo usuario
-        const user= await this.usersService.findOneByEmail(registerDto.email); // Buscar el usuario por email
+        const user= await this.usersService.findOneByRut(registerDto.rut); // Buscar el usuario por email
         if(user) { // Si el usuario ya existe
             throw new BadRequestException('User already exists'); // Lanzar un error
         }
@@ -28,7 +28,7 @@ export class AuthService {
         return await this.usersService.create(newUser); // Llama al servicio de usuarios para crear un nuevo usuario
     }
     async login(loginDto:LoginDto){ // Método para iniciar sesión
-        const user= await this.usersService.findOneByEmail(loginDto.email);
+        const user= await this.usersService.findOneByRut(loginDto.rut);
         if(!user) { // Si el usuario no existe
             throw new UnauthorizedException('email not found'); // Lanzar un error
         }
