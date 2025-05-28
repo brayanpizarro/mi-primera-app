@@ -1,7 +1,7 @@
 // src/Login.tsx
 import React, { useState } from 'react';
 import './Login.css';
-import { login } from './services/authService';
+import { login } from '../services/authService';
 
 // Función para validar formato de RUT chileno
 const validarRUT = (rut: string): boolean => {

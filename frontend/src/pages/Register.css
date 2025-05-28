@@ -1,0 +1,44 @@
+/* src/index.css o src/Register.css */
+.register-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 4rem;
+    border: 1px solid #2390b8;
+    border-radius: 8px;
+    background-color: #65b8d3;
+} 
+.register-container h2 {
+    text-align: center;
+    font-size: 2rem ;
+}                               
+.form-group {
+    margin-bottom: 1rem;
+    
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #571414;
+    border-radius: 4px;
+}
+
+.submit-button {
+    background-color: #4e9999;
+    color: rgb(255, 255, 255);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #45a049;
+}
