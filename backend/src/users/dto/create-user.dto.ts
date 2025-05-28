@@ -1,7 +1,5 @@
-import { IsString, MinLength } from "class-validator";
-import { IsEnum } from 'class-validator';
-import { UserRole } from "../entities/user-role.enum";
-
+import { IsString, MinLength, IsEmail, IsEnum } from 'class-validator';
+import { UserRole } from '../schema/user-role.enum';
 
 export class CreateUserDto {
     @IsString()
@@ -9,16 +7,17 @@ export class CreateUserDto {
     name: string; // Nombre del usuario
 
     @IsString()
-    rut: string; // Rut del usuario unico
+    rut: string; // Rut del usuario único
 
-    @IsString()
+    @IsEmail()
     email: string; // Correo electrónico del usuario
 
     @IsString()
+    @MinLength(6)
     password: string; // Contraseña del usuario
 
     @IsEnum(UserRole)
     role: UserRole;
-
 }
+
 

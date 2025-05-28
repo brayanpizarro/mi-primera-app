@@ -1,5 +1,5 @@
-import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { UserRole } from '../entities/user-role.enum';
+import { IsEnum, IsOptional, IsString, MinLength, IsEmail } from 'class-validator';
+import { UserRole } from '../schema/user-role.enum';
 
 export class UpdateUserDto {
     @IsString()
@@ -7,7 +7,7 @@ export class UpdateUserDto {
     @IsOptional()
     name?: string; // Nombre del usuario
     
-    @IsString()
+    @IsEmail()
     @IsOptional()
     email?: string; // Correo electrónico del usuario
     
@@ -16,9 +16,11 @@ export class UpdateUserDto {
     rut?: string; // Rut del usuario
 
     @IsString()
+    @MinLength(6)
     @IsOptional()
     password?: string; // Contraseña del usuario
     
     @IsEnum(UserRole)
-    role: UserRole;
+    @IsOptional()
+    role?: UserRole;
 }

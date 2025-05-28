@@ -1,4 +1,4 @@
-import { UserRole } from "src/users/entities/user-role.enum";
+import { UserRole } from "src/users/schema/user-role.enum";
 export declare class RegisterDto {
     name: string;
     email: string;

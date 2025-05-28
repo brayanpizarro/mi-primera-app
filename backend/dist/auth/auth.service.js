@@ -8,16 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const users_service_1 = require("../users/users.service");
-const bcryptjs = require("bcryptjs");
 const jwt_1 = require("@nestjs/jwt");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const user_schema_1 = require("../users/schema/user.schema");
+const bcrypt = require("bcrypt");
+const users_service_1 = require("../users/users.service");
 let AuthService = class AuthService {
+    userModel;
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    constructor(userModel, usersService, jwtService) {
+        this.userModel = userModel;
         this.usersService = usersService;
         this.jwtService = jwtService;
     }
@@ -26,34 +34,38 @@ let AuthService = class AuthService {
         if (user) {
             throw new common_1.BadRequestException('User already exists');
         }
-        const passwordHash = await bcryptjs.hash(registerDto.password, 10);
+        const passwordHash = await bcrypt.hash(registerDto.password, 10);
         const newUser = {
             ...registerDto,
             password: passwordHash,
         };
         return await this.usersService.create(newUser);
     }
-    async login(loginDto) {
-        const user = await this.usersService.findOneByRut(loginDto.rut);
+    async validateUser(rut, password) {
+        const user = await this.userModel.findOne({ rut, isActive: true }).exec();
         if (!user) {
-            throw new common_1.UnauthorizedException('email not found');
+            throw new common_1.UnauthorizedException('Credenciales inválidas');
         }
-        const isPassword = await bcryptjs.compare(loginDto.password, user.password);
-        if (!isPassword) {
-            throw new common_1.UnauthorizedException('password not found');
+        const passwordValid = await bcrypt.compare(password, user.password);
+        if (!passwordValid) {
+            throw new common_1.UnauthorizedException('Credenciales inválidas');
         }
-        const payload = { email: user.email };
-        const token = this.jwtService.sign(payload);
+        const { password: _, ...result } = user.toObject();
+        return result;
+    }
+    async login(user) {
+        const payload = { username: user.rut, sub: user._id, role: user.role };
         return {
-            token,
-            user,
+            access_token: this.jwtService.sign(payload),
         };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService,
+    __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        users_service_1.UsersService,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

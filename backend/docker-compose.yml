@@ -5,30 +5,24 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      - mongo
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: mi_basedatos
+      MONGO_URI: mongodb://mongo:27017/mi_basedatos
     volumes:
       - .:/app
       - /app/node_modules
     command: pnpm run start:dev  # usa start:dev si tienes hot reload configurado
 
-  postgres:
-    image: postgres:15
-    container_name: postgres
+  mongo:
+    image: mongo:6
+    container_name: mongo
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mi_basedatos
     ports:
-      - "5433:5432"  
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: mi_basedatos
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongo_data:/data/db
 
 volumes:
-  postgres_data:
+  mongo_data:

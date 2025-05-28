@@ -1,15 +1,15 @@
+import { Model } from 'mongoose';
+import { User, UserDocument } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
 export declare class UsersService {
-    private readonly userRepository;
-    constructor(userRepository: Repository<User>);
-    create(createUserDto: CreateUserDto): Promise<CreateUserDto & User>;
+    private userModel;
+    constructor(userModel: Model<UserDocument>);
+    create(createUserDto: CreateUserDto): Promise<User>;
     findAll(): Promise<User[]>;
-    findOne(id: number): string;
+    findById(id: string): Promise<User>;
     findOneByRut(rut: string): Promise<User | null>;
-    findOneByEmail(email: string): Promise<User | null>;
-    update(id: number, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
-    remove(id: number): Promise<import("typeorm").UpdateResult>;
+    update(id: string, updateUserDto: UpdateUserDto): Promise<User>;
+    softDelete(id: string): Promise<User>;
+    restore(id: string): Promise<User>;
 }

@@ -14,40 +14,57 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("typeorm");
-const typeorm_2 = require("@nestjs/typeorm");
-const user_entity_1 = require("./entities/user.entity");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const user_schema_1 = require("./schema/user.schema");
 let UsersService = class UsersService {
-    userRepository;
-    constructor(userRepository) {
-        this.userRepository = userRepository;
+    userModel;
+    constructor(userModel) {
+        this.userModel = userModel;
     }
     async create(createUserDto) {
-        return await this.userRepository.save(createUserDto);
+        const newUser = new this.userModel(createUserDto);
+        return newUser.save();
     }
     async findAll() {
-        return await this.userRepository.find();
+        return this.userModel.find({ isActive: true }).exec();
     }
-    findOne(id) {
-        return `This action returns a #${id} user`;
+    async findById(id) {
+        const user = await this.userModel.findById(id).exec();
+        if (!user || !user.isActive) {
+            throw new common_1.NotFoundException('User not found or inactive');
+        }
+        return user;
     }
-    findOneByRut(rut) {
-        return this.userRepository.findOneBy({ rut });
-    }
-    findOneByEmail(email) {
-        return this.userRepository.findOneBy({ email });
+    async findOneByRut(rut) {
+        return this.userModel.findOne({ rut }).exec();
     }
     async update(id, updateUserDto) {
-        return await this.userRepository.update(id, updateUserDto);
+        const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+        if (!updatedUser) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return updatedUser;
     }
-    async remove(id) {
-        return await this.userRepository.softDelete(id);
+    async softDelete(id) {
+        const deletedUser = await this.userModel.findByIdAndUpdate(id, { isActive: false, deletedAt: new Date() }, { new: true }).exec();
+        if (!deletedUser) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return deletedUser;
+    }
+    async restore(id) {
+        const restoredUser = await this.userModel.findByIdAndUpdate(id, { isActive: true, deletedAt: null }, { new: true }).exec();
+        if (!restoredUser) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return restoredUser;
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_2.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_1.Repository])
+    __param(0, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

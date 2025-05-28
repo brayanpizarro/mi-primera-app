@@ -1,20 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstanst } from './constants/jwt.constants'; // Importar constantes de JWT
+import { MongooseModule } from '@nestjs/mongoose';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { UsersModule } from '../users/users.module';
+import { User, UserSchema } from '../users/schema/user.schema';
 
 @Module({
   imports: [
     UsersModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
-      global: true, // Hacer que el módulo JWT esté disponible en toda la aplicación  
-      secret: jwtConstanst.secret,// Clave secreta para firmar el token  
-      signOptions: { expiresIn: '1d' }, // Opciones de firma del token (tiempo de expiración)
-    })
-  ], // Importar el servicio de usuarios
-  controllers: [AuthController], // Controlador de autenticación
-  providers: [AuthService] // Servicio de autenticación
+      global: true, // para usarlo en otros módulos
+      secret: process.env.JWT_SECRET || 'mysecret', // usa .env en producción
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}

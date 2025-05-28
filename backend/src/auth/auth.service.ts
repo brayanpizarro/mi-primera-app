@@ -1,48 +1,56 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { RegisterDto } from './dto/register.dto';
-
-import * as bcryptjs from 'bcryptjs'; // Importar bcrypt para encriptar contraseñas
-import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from '../users/schema/user.schema';
+import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly usersService: UsersService, // Inyectar el servicio de usuarios
+    private jwtService: JwtService,
+  ) {}
 
-    constructor(
-        private readonly usersService:UsersService, // Inyectar el servicio de autenticación
-        private readonly jwtService:JwtService, // Inyectar el servicio de JWT
-    
-    ) { } 
+  async register(registerDto: RegisterDto) {
+    const user = await this.usersService.findOneByRut(registerDto.rut); // Buscar el usuario por RUT
 
-    async register(registerDto:RegisterDto) { // Método para registrar un nuevo usuario
-        const user= await this.usersService.findOneByRut(registerDto.rut); // Buscar el usuario por email
-        if(user) { // Si el usuario ya existe
-            throw new BadRequestException('User already exists'); // Lanzar un error
-        }
-        const passwordHash = await bcryptjs.hash(registerDto.password, 10); // Encriptar la contraseña
-        const newUser = {
-            ...registerDto,// Desestructurar el objeto registerDto
-            password: passwordHash, // reemplazar la contraseña por la encriptada
-          };
-        return await this.usersService.create(newUser); // Llama al servicio de usuarios para crear un nuevo usuario
+    if (user) {
+        throw new BadRequestException('User already exists');
     }
-    async login(loginDto:LoginDto){ // Método para iniciar sesión
-        const user= await this.usersService.findOneByRut(loginDto.rut);
-        if(!user) { // Si el usuario no existe
-            throw new UnauthorizedException('email not found'); // Lanzar un error
-        }
-        const isPassword = await bcryptjs.compare(loginDto.password, user.password); // Comparar la contraseña
-        if(!isPassword) { // Si la contraseña no coincide
-            throw new UnauthorizedException('password not found'); // Lanzar un error
-        }
-        const payload = {email:user.email}; // Email del usuario
 
-        const token = this.jwtService.sign(payload); // Firmar el token
+    const passwordHash = await bcrypt.hash(registerDto.password, 10); // ✅ usa bcrypt.hash
 
-        return {
-            token,
-            user ,
-        };
+    const newUser = {
+        ...registerDto,
+        password: passwordHash, // Guarda la contraseña encriptada
+    };
+
+    return await this.usersService.create(newUser); // Guarda el nuevo usuario en MongoDB
+  }
+
+  async validateUser(rut: string, password: string): Promise<any> {
+    const user = await this.userModel.findOne({ rut, isActive: true }).exec();
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    const { password: _, ...result } = user.toObject();
+    return result;
+  }
+
+  async login(user: any) {
+    const payload = { username: user.rut, sub: user._id, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
 }

@@ -1,51 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  constructor(
-    @InjectRepository(User) //inyectar el repositorio de usuario
-    //el repositorio es una clase que se encarga de interactuar con la base de datos
-    private readonly userRepository: Repository<User>, 
-  ) {}
-
-  async create(createUserDto: CreateUserDto) { //crear un nuevo usuario
-    //el createUserDto es un objeto que contiene los datos del usuario a crear
-    return await this.userRepository.save(createUserDto); //guardar el usuario en la base de datos
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = new this.userModel(createUserDto);
+    return newUser.save();
   }
 
-  async findAll() {//buscar todos los usuarios
-    //el find() devuelve todos los usuarios de la base de datos
-    return await this.userRepository.find();
+  async findAll(): Promise<User[]> {
+    return this.userModel.find({ isActive: true }).exec();
   }
 
-  findOne(id: number) {//buscar un usuario por id
-    //el id es unico por lo que no se puede repetir
-    return `This action returns a #${id} user`;
+  async findById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
+    if (!user || !user.isActive) {
+      throw new NotFoundException('User not found or inactive');
+    }
+    return user;
   }
   
-  findOneByRut(rut: string) { //buscar un usuario por rut
-    return this.userRepository.findOneBy({rut}); //buscar el usuario por rut en la base de datos
+  async findOneByRut(rut: string): Promise<User | null> {
+  return this.userModel.findOne({ rut }).exec();
   }
 
-  findOneByEmail(email: string) { //buscar un usuario por email
-    //el email es unico por lo que no se puede repetir
-    return  this.userRepository.findOneBy({email}); //buscar el usuario por email en la base de datos
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      updateUserDto,
+      { new: true }
+    ).exec();
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+    return updatedUser;
   }
 
-    async update(id: number, updateUserDto: UpdateUserDto) {//actualizar un usuario por id
-    //el id es unico por lo que no se puede repetir
-    return await this.userRepository.update(id, updateUserDto); //actualizar el usuario en la base de datos (se le pasa el id y el dto)
+  async softDelete(id: string): Promise<User> {
+    const deletedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      { isActive: false, deletedAt: new Date() },
+      { new: true }
+    ).exec();
+    if (!deletedUser) {
+      throw new NotFoundException('User not found');
+    }
+    return deletedUser;
   }
 
-  async remove(id: number) {//eliminar un usuario por id
-    //el id es unico por lo que no se puede repetir
-    return await this.userRepository.softDelete(id); //eliminar el usuario de la base de datos (se le pasa el id)
-    //return await this.useraRepository.softRemove(id); //eliminar el usuario de la base de datos (se le pasa ña instancia del usuario)
+  async restore(id: string): Promise<User> {
+    const restoredUser = await this.userModel.findByIdAndUpdate(
+      id,
+      { isActive: true, deletedAt: null },
+      { new: true }
+    ).exec();
+    if (!restoredUser) {
+      throw new NotFoundException('User not found');
+    }
+    return restoredUser;
   }
 }

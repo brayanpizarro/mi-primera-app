@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsEmail, IsEnum, IsString, Matches, min, MinLength } from "class-validator";
-import { UserRole } from "src/users/entities/user-role.enum";
+import { UserRole } from "src/users/schema/user-role.enum";
 
 export class RegisterDto{
     @Transform(({ value }) => value.trim()) 

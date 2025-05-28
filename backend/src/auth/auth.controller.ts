@@ -1,34 +1,23 @@
-import { Body, Controller, Get, Post ,UseGuards,Req} from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from './guard/auth.guard';
-import { Request } from 'express';
+import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private readonly authService:AuthService ){    }
+  constructor(private readonly authService: AuthService) {}
 
-    @Post('register')
-    register(
-        @Body() // Decorador para obtener el cuerpo de la solicitud
-        registerDto:RegisterDto,
-    ){
-        return this.authService.register(registerDto); // Llama al servicio de autenticación para registrar un nuevo usuario
-     }
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.rut, loginDto.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return this.authService.login(user);
+  }
 
-    @Post('login')
-    login(
-        @Body() // Decorador para obtener el cuerpo de la solicitud
-        loginDto:LoginDto, // DTO para el inicio de sesión);
-        
-    ){
-        return this.authService.login(loginDto); // Llama al servicio de autenticación para iniciar sesión
-    }
-    @Get('profile')
-    @UseGuards(AuthGuard) // Guard para proteger la ruta
-    profile(@Req() req:Request) { // Decorador para obtener la solicitud
-        return (req as any).user; // Devuelve un mensaje de perfil
-    }
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
+  }
 }

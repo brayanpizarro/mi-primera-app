@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-const user_role_enum_1 = require("../../users/entities/user-role.enum");
+const user_role_enum_1 = require("../../users/schema/user-role.enum");
 class RegisterDto {
     name;
     email;
