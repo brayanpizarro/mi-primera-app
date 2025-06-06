@@ -4,7 +4,7 @@ import RegisterUser from './pages/RegisterUser';
 const App = () => {
   return (
     <div className="app">
-    <RegisterUser/>
+    <Login/>
    
  
      {/*<InventoryPage />/*/} 

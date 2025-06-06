@@ -1,33 +1,64 @@
 // src/pages/RegisterUser.tsx
-
 import './Register.css';
 
 const RegisterUser = () => {
   return (
-    <div className="register-container">
-      <h2>Registro Usuario</h2>
-      <form>
-        <div className="form-group">
-          <label>Nombre de usuario</label>
-          <input type="text" placeholder="Ej: JuanPerez" />
+    <div className="register-wrapper">
+      <div className="register-container">
+        <div className="register-header">
+          <h2 className="app-title">Crear Cuenta</h2>
+          <p className="app-subtitle">StockMind - Gestión de Inventarios UCN</p>
         </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input type="email" placeholder="Ej: usuario@email.com" />
-        </div>
-        <div className="form-group">
-          <label>Contraseña</label>
-          <input type="password" placeholder="******" />
-        </div>
-        <div className="form-group">
-          <label>Rol</label>
-          <select>
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
-        <button type="submit" className="submit-button">Registrar</button>
-      </form>
+        
+        <form className="register-form">
+          <div className="form-group">
+            <label className="form-label">Nombre Completo</label>
+            <input 
+              type="text" 
+              className="form-input"
+              placeholder="Ej: Pablo Perez"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label className="form-label">RUT</label>
+            <input 
+              type="text" 
+              className="form-input"
+              placeholder="12345678-9"
+              required
+              pattern="\d{7,8}-[\dKk]"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label className="form-label">Correo Institucional</label>
+            <input 
+              type="email" 
+              className="form-input"
+              placeholder="usuario@alumnos.ucn.cl"
+              required
+              pattern=".+@(alumnos|ucn)\.cl"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label className="form-label">Contraseña</label>
+            <input 
+              type="password" 
+              className="form-input"
+              placeholder="Mínimo 8 caracteres"
+              required
+              minLength={8}
+            />
+          </div>
+          
+          <button type="submit" className="submit-button">
+            Registrarse
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
