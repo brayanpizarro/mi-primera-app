@@ -25,6 +25,15 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
         </label>
 
         <label>
+          Descripción:
+          <input
+            type="text"
+            value={item.description}
+            onChange={(e) => onChange('description', e.target.value)}
+          />
+        </label>
+
+        <label>
           Ubicación:
           <input
             type="text"

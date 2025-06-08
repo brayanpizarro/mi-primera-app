@@ -1,46 +1,59 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InventoryTable from '../components/InventoryTable';
 import { InventoryItem } from '../types/InventoryItem';
-import { getInventory, deleteInventoryItem, updateInventoryQuantity } from '../services/inventoryService';
-import { updateInventoryItem } from '../services/inventoryService'; 
+import {
+  getInventory,
+  updateInventoryItem,
+  createInventoryItem,
+  deleteInventoryItem
+} from '../services/inventoryService';
 import EditModal from '../components/EditModal';
+import AddModal from '../components/AddModal';
+import './InventoryPage.css';
 
 const InventoryPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [addingItem, setAddingItem] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     getInventory()
       .then(res => {
-        console.log('Datos recibidos:', res.data); 
         setItems(res.data);
       })
       .catch(err => console.error('Error al cargar inventario:', err))
       .finally(() => setLoading(false));
   }, []);
 
-   const onEdit = (id: number) => {
+  // Edit handlers
+  const onEdit = (id: number) => {
     const item = items.find(i => i.id === id);
     if (item) setEditingItem(item);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingItem) return;
+const handleSaveEdit = async () => {
+  if (!editingItem) return;
 
-    try {
-      await updateInventoryItem(editingItem.id, editingItem);
-      setItems(prev =>
-        prev.map(p => (p.id === editingItem.id ? editingItem : p))
-      );
-      setEditingItem(null); // cerrar el "modo edición"
-    } catch (err) {
-      console.error('Error al editar:', err);
-      alert('No se pudo actualizar el producto.');
-    }
-  };
+  const { id, createdAt, ...updateData } = editingItem;
+
+  try {
+    await updateInventoryItem(id, updateData);
+    setItems(prev =>
+      prev.map(p => (p.id === id ? editingItem : p))
+    );
+    setEditingItem(null);
+    setMessage(`El objeto"${editingItem.name}" ha sido actualizado correctamente `);
+    setTimeout(() => setMessage(''), 3000);
+  } catch (err) {
+    console.error('Error al editar:', err);
+    alert('No se pudo actualizar el producto.');
+  }
+};
 
   const handleEditChange = (field: keyof InventoryItem, value: string | number) => {
     setEditingItem(prev =>
@@ -48,93 +61,156 @@ const InventoryPage = () => {
     );
   };
 
+  // Delete handler con confirmación de cantidad si es > 1
+  const onDelete = async (id: number) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
 
-const onDelete = async (id: number) => {
-  const item = items.find(i => i.id === id);
-  if (!item) return;
+    if (item.quantity > 1) {
+      const cantidad = prompt(`Este producto tiene ${item.quantity} unidades. ¿Cuántas quieres eliminar?`);
+      if (cantidad === null) return; // canceló
 
-  if (item.quantity <= 1) {
-    const confirmDelete = window.confirm(`¿Eliminar "${item.name}" del inventario?`);
-    if (!confirmDelete) return;
+      const cantidadNum = Number(cantidad);
+      if (isNaN(cantidadNum) || cantidadNum <= 0 || cantidadNum > item.quantity) {
+        alert('Cantidad inválida.');
+        return;
+      }
 
-    try {
-      await deleteInventoryItem(id);
-      setItems(items.filter(i => i.id !== id));
-      setMessage(` "${item.name}" fue eliminado correctamente. ✅`);
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      console.error('Error al eliminar:', err);
-      alert('Hubo un error al eliminar el producto.');
-    }
-  } else {
-    const input = window.prompt(`"${item.name}" tiene ${item.quantity} unidades. ¿Cuántas deseas eliminar?`, '1');
-    const cantidadEliminar = parseInt(input || '');
-
-    if (isNaN(cantidadEliminar) || cantidadEliminar < 1) {
-      alert('Cantidad inválida.');
-      return;
-    }
-
-    if (cantidadEliminar >= item.quantity) {
-      const confirmDelete = window.confirm(`Estás intentando eliminar todas las unidades. ¿Eliminar el producto completo?`);
-      if (!confirmDelete) return;
+      if (cantidadNum === item.quantity) {
+        // Eliminar todo el ítem
+        try {
+          await deleteInventoryItem(id);
+          setItems(prev => prev.filter(p => p.id !== id));
+          setMessage(`"${item.name}" eliminado completamente ✅`);
+          setTimeout(() => setMessage(''), 3000);
+        } catch (err) {
+          console.error('Error al eliminar:', err);
+          alert('No se pudo eliminar el producto.');
+        }
+      } else {
+        // Actualizar cantidad
+        try {
+          const nuevaCantidad = item.quantity - cantidadNum;
+          await updateInventoryItem(id, { quantity: nuevaCantidad });
+          setItems(prev =>
+            prev.map(p =>
+              p.id === id ? { ...p, quantity: nuevaCantidad } : p
+            )
+          );
+          setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad} ✅`);
+          setTimeout(() => setMessage(''), 3000);
+        } catch (err) {
+          console.error('Error al actualizar cantidad:', err);
+          alert('No se pudo actualizar la cantidad.');
+        }
+      }
+    } else {
+      // Solo una unidad, eliminar directamente
+      if (!window.confirm(`¿Seguro que quieres eliminar "${item.name}"?`)) return;
 
       try {
         await deleteInventoryItem(id);
-        setItems(items.filter(i => i.id !== id));
-        setMessage(`"${item.name}" fue eliminado completamente.✅`);
+        setItems(prev => prev.filter(p => p.id !== id));
+        setMessage(`"${item.name}" eliminado correctamente ✅`);
         setTimeout(() => setMessage(''), 3000);
       } catch (err) {
         console.error('Error al eliminar:', err);
-        alert('Hubo un error al eliminar el producto.');
-      }
-    } else {
-      try {
-        const nuevaCantidad = item.quantity - cantidadEliminar;
-        await updateInventoryQuantity(id, nuevaCantidad);
-
-        setItems(prev =>
-          prev.map(p => (p.id === id ? { ...p, quantity: nuevaCantidad } : p))
-        );
-
-        setMessage(`Se eliminaron ${cantidadEliminar} unidades de "${item.name}". ✅`);
-        setTimeout(() => setMessage(''), 3000);
-      } catch (err) {
-        console.error('Error al actualizar cantidad:', err);
-        alert('No se pudo actualizar la cantidad.');
+        alert('No se pudo eliminar el producto.');
       }
     }
-  }
-};
+  };
 
+  // Filtro y búsqueda
+  const filteredItems = items
+    .filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    .sort((a, b) => {
+      const factor = sortDirection === 'asc' ? 1 : -1;
+      switch (filter) {
+        case 'price':
+          return (a.price - b.price) * factor;
+        case 'quantity':
+          return (a.quantity - b.quantity) * factor;
+        case 'createdAt':
+          return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * factor;
+        default:
+          return 0;
+      }
+    });
 
- return (
-    <div style={{ padding: '2rem' }}>
+  return (
+    <div className="inventory-container">
       <h1>Inventario</h1>
-          {message && (
-            <div style={{
-                marginBottom: '1rem',
-                padding: '0.75rem',
-                backgroundColor: '#d4edda',
-                color: '#155724',
-                border: '1px solid #c3e6cb',
-                borderRadius: '5px',
-            }}>
-                {message}
-            </div>
-            )}
+      {message && <div className="success-message">{message}</div>}
+
+      <div className="controls">
+        <input
+          type="text"
+          placeholder="Buscar por nombre o descripción..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="filter-select"
+        >
+          <option value="">Ordenar por...</option>
+          <option value="price">Precio</option>
+          <option value="quantity">Cantidad</option>
+          <option value="createdAt">Fecha de ingreso</option>
+        </select>
+
+        <select
+          value={sortDirection}
+          onChange={(e) => setSortDirection(e.target.value as 'asc' | 'desc')}
+          className="filter-select"
+        >
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select>
+
+        <button className="add-button" onClick={() => setAddingItem(true)}>
+          + Agregar Producto
+        </button>
+      </div>
+
       {loading ? <p>Cargando...</p> : (
         <>
-          <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} />
-          
-         {editingItem && (
+          <InventoryTable items={filteredItems} onEdit={onEdit} onDelete={onDelete} />
+
+          {/* Modal para editar */}
+          {editingItem && (
             <EditModal
-                item={editingItem}
-                onChange={handleEditChange}
-                onSave={handleSaveEdit}
-                onCancel={() => setEditingItem(null)}
+              item={editingItem}
+              onChange={handleEditChange}
+              onSave={handleSaveEdit}
+              onCancel={() => setEditingItem(null)}
             />
-            )}
+          )}
+
+          {/* Modal para agregar nuevo ítem usando AddModal */}
+          {addingItem && (
+            <AddModal
+              onAdd={async (newItem) => {
+                try {
+                  const res = await createInventoryItem(newItem);
+                  setItems(prev => [...prev, res.data]);
+                  setAddingItem(false);
+                  setMessage(`"${newItem.name}" agregado correctamente ✅`);
+                  setTimeout(() => setMessage(''), 3000);
+                } catch (err) {
+                  console.error('Error al agregar:', err);
+                  alert('No se pudo agregar el producto.');
+                }
+              }}
+              onCancel={() => setAddingItem(false)}
+            />
+          )}
         </>
       )}
     </div>

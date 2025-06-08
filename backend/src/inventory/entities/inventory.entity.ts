@@ -22,4 +22,6 @@ export class Inventory {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  
 }

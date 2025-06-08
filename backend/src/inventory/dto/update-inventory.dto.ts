@@ -1,4 +1,6 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+// src/inventory/dto/update-inventory.dto.ts
+import { IsString, IsOptional, IsNumber, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateInventoryDto {
   @IsOptional()
@@ -14,10 +16,14 @@ export class UpdateInventoryDto {
   location?: string;
 
   @IsOptional()
+  @Type(() => Number)      
   @IsNumber()
+  @Min(0)
   price?: number;
 
   @IsOptional()
+  @Type(() => Number)      
   @IsNumber()
+  @Min(0)
   quantity?: number;
 }
