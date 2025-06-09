@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { InventoryItem } from '../types/InventoryItem';
 import './InventoryTable.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png'
 
 interface Props {
   items: InventoryItem[];
@@ -39,17 +40,13 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
           {items.map(item => (
             <tr key={item.id}>
               <td>
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="inventory-image"
-                    onClick={() => openModal(item.imageUrl!)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                ) : (
-                  'Sin imagen'
-                )}
+                <img
+                  src={item.imageUrl || imagenPredeterminada}
+                  alt={item.name}
+                  className="inventory-image"
+                  onClick={() => openModal(item.imageUrl || imagenPredeterminada)}
+                  style={{ cursor: 'pointer' }}
+                />
               </td>
               <td>{item.name}</td>
               <td>{item.description || '-'}</td>

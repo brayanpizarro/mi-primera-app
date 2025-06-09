@@ -52,7 +52,7 @@
 .add-button {
   margin-left: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #4f94d4;
+   background-color: #007bff;
   border: none;
   border-radius: 8px;
   color: white;
@@ -63,7 +63,7 @@
 }
 
 .add-button:hover {
-  background-color: #3a78c2;
+  background-color: #0056b3;
 }
 
 .add-button:active {

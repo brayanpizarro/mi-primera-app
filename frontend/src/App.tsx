@@ -4,8 +4,8 @@ import RegisterUser from './pages/RegisterUser';
 const App = () => {
   return (
     <div className="app">
-    <Login/>
-     {/*<InventoryPage />/*/} 
+   {/* <Login/>*/} 
+     <InventoryPage />
 
     </div>
   );

@@ -17,14 +17,40 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
   const [price, setPrice] = useState<number | ''>('');
   const [quantity, setQuantity] = useState<number | ''>('');
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imagePreview, setImagePreview] = useState('');
   const [uploading, setUploading] = useState(false);
   const [show, setShow] = useState(false);
+  const [showDeleteSelect, setShowDeleteSelect] = useState(false);
 
-  // Animación fade-in al montar
+  const [locations, setLocations] = useState<string[]>(() => {
+    const saved = localStorage.getItem('locations');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [newLocation, setNewLocation] = useState('');
+  const [showNewLocationInput, setShowNewLocationInput] = useState(false);
+
   useEffect(() => {
     setShow(true);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('locations', JSON.stringify(locations));
+  }, [locations]);
+
+  const handleAddLocation = () => {
+    const trimmed = newLocation.trim();
+    if (!trimmed) return;
+    if (locations.includes(trimmed)) {
+      alert('La ubicación ya existe.');
+      return;
+    }
+    setLocations(prev => [...prev, trimmed]);
+    setLocation(trimmed);
+    setNewLocation('');
+    setShowNewLocationInput(false);
+  };
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -37,6 +63,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
     if (!name.trim()) return alert('El nombre es obligatorio'), false;
     if (price === '' || price < 0) return alert('El precio debe ser ≥ 0'), false;
     if (quantity === '' || quantity < 0) return alert('La cantidad debe ser ≥ 0'), false;
+    if (!location) return alert('Debe seleccionar una ubicación'), false;
     return true;
   };
 
@@ -47,10 +74,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
     formData.append('upload_preset', UPLOAD_PRESET);
     setUploading(true);
     try {
-      const res = await fetch(CLOUDINARY_URL, {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
       const data = await res.json();
       return data.secure_url;
     } catch (error) {
@@ -75,7 +99,6 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
       imageUrl,
     });
 
-    // Limpiar campos al agregar
     setName('');
     setDescription('');
     setLocation('');
@@ -87,7 +110,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
 
   const handleClose = () => {
     setShow(false);
-    setTimeout(() => onCancel(), 300); // Espera animación antes de cerrar modal
+    setTimeout(() => onCancel(), 300);
   };
 
   return (
@@ -97,18 +120,99 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
 
         <label>
           Nombre:
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input value={name} onChange={e => setName(e.target.value)} />
         </label>
 
         <label>
           Descripción:
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          <textarea value={description} onChange={e => setDescription(e.target.value)} />
         </label>
 
+
+        <label className="form-label">Ubicación:</label>
+
+        {/* select principal */}
         <label>
-          Ubicación:
-          <input value={location} onChange={(e) => setLocation(e.target.value)} />
+          <select
+            className="form-select"
+            value={location}
+            onChange={e => setLocation(e.target.value)}
+          >
+            <option value="">-- Seleccione una ubicación --</option>
+            {locations.map(loc => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
         </label>
+
+        {/* BOTONES de acción (misma línea, estilo uniforme) */}
+       <div className="location-buttons">
+          <button
+            type="button"
+            className="small-btn"
+            onClick={() => {
+              setShowNewLocationInput(prev => {
+                if (!prev) setShowDeleteSelect(false);
+                return !prev;
+              });
+            }}
+          >
+            {showNewLocationInput ? 'Cancelar' : 'Agregar ubicación'}
+          </button>
+
+          <button
+            type="button"
+            className="small-btn danger"
+            onClick={() => {
+              setShowDeleteSelect(prev => {
+                if (!prev) setShowNewLocationInput(false);
+                return !prev;
+              });
+            }}
+          >
+            {showDeleteSelect ? 'Cancelar' : 'Eliminar ubicación'}
+          </button>
+        </div>
+
+        {/* INPUT para agregar nueva ubicación */}
+        {showNewLocationInput && (
+          <div className="add-location-row">
+            <input
+              className="form-input"
+              value={newLocation}
+              onChange={e => setNewLocation(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddLocation(); } }}
+              placeholder="Nueva ubicación"
+            />
+            <button type="button" className="small-btn add" onClick={handleAddLocation}>+</button>
+            <button type="button" className="small-btn cancel" onClick={() => setShowNewLocationInput(false)}>×</button>
+          </div>
+        )}
+
+        {/* SELECT para elegir qué ubicación eliminar */}
+        {showDeleteSelect && locations.length > 0 && (
+          <div className="delete-location-row">
+            <select
+              className="form-select"
+              defaultValue=""
+              onChange={e => {
+                const toDelete = e.target.value;
+                if (toDelete && window.confirm(`¿Eliminar la ubicación "${toDelete}"?`)) {
+                  setLocations(prev => prev.filter(l => l !== toDelete));
+                  if (location === toDelete) setLocation('');
+                }
+              }}
+            >
+              <option value="">-- Seleccione para eliminar --</option>
+              {locations.map(loc => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+
+
 
         <label>
           Precio:
@@ -116,7 +220,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
             type="number"
             min="0"
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onChange={e => setPrice(Number(e.target.value))}
           />
         </label>
 
@@ -126,7 +230,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
             type="number"
             min="0"
             value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
+            onChange={e => setQuantity(Number(e.target.value))}
           />
         </label>
 
@@ -145,9 +249,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
 
         <div className="modal-buttons">
           <button onClick={handleAdd}>Agregar</button>
-          <button className="cancel" onClick={handleClose}>
-            Cancelar
-          </button>
+          <button className="cancel" onClick={handleClose}>Cancelar</button>
         </div>
       </div>
     </div>

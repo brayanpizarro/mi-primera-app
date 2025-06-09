@@ -20,6 +20,8 @@ const InventoryPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
 
   useEffect(() => {
     getInventory()
@@ -106,7 +108,7 @@ const handleSaveEdit = async () => {
         try {
           await deleteInventoryItem(id);
           setItems(prev => prev.filter(p => p.id !== id));
-          setMessage(`"${item.name}" eliminado completamente ✅`);
+          setMessage(`"${item.name}" eliminado completamente`);
           setTimeout(() => setMessage(''), 3000);
         } catch (err) {
           console.error('Error al eliminar:', err);
@@ -122,7 +124,7 @@ const handleSaveEdit = async () => {
               p.id === id ? { ...p, quantity: nuevaCantidad } : p
             )
           );
-          setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad} ✅`);
+          setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad}`);
           setTimeout(() => setMessage(''), 3000);
         } catch (err) {
           console.error('Error al actualizar cantidad:', err);
@@ -136,7 +138,7 @@ const handleSaveEdit = async () => {
       try {
         await deleteInventoryItem(id);
         setItems(prev => prev.filter(p => p.id !== id));
-        setMessage(`"${item.name}" eliminado correctamente ✅`);
+        setMessage(`"${item.name}" eliminado correctamente`);
         setTimeout(() => setMessage(''), 3000);
       } catch (err) {
         console.error('Error al eliminar:', err);
@@ -146,11 +148,14 @@ const handleSaveEdit = async () => {
   };
 
   // Filtro y búsqueda
-  const filteredItems = items
-    .filter(item =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
+    const filteredItems = items
+      .filter(item =>
+        (item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())))
+        &&
+        (selectedLocation === '' || item.location === selectedLocation)
+      )
+
     .sort((a, b) => {
       const factor = sortDirection === 'asc' ? 1 : -1;
       switch (filter) {
@@ -178,6 +183,16 @@ const handleSaveEdit = async () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
         />
+        <select
+          value={selectedLocation}
+          onChange={(e) => setSelectedLocation(e.target.value)}
+          className="filter-select"
+        >
+          <option value="">Todas las ubicaciones</option>
+          {locations.map((loc) => (
+            <option key={loc} value={loc}>{loc}</option>
+          ))}
+        </select>
 
         <select
           value={filter}
@@ -226,7 +241,7 @@ const handleSaveEdit = async () => {
                   const res = await createInventoryItem(newItem);
                   setItems(prev => [...prev, res.data]);
                   setAddingItem(false);
-                  setMessage(`"${newItem.name}" agregado correctamente ✅`);
+                  setMessage(`"${newItem.name}" agregado correctamente`);
                   setTimeout(() => setMessage(''), 3000);
                 } catch (err) {
                   console.error('Error al agregar:', err);

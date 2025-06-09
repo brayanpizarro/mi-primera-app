@@ -138,3 +138,124 @@ button:hover {
 .modal-buttons button.cancel {
   background-color: #ccc;
 }
+
+.location-list {
+  margin-top: 1rem;
+  background: #f7f7f7;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+.location-list ul {
+  list-style: none;
+  padding: 0;
+}
+.location-list li {
+  margin-bottom: 0.5rem;
+}
+.section-title {
+  margin-top: rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.location-actions {
+  margin-bottom: 0.5rem;
+}
+
+.add-location-row,
+.delete-location-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem; 
+  margin-bottom: 0.8rem;
+}
+
+.add-location-row input {
+  flex: 1;
+}
+
+.btn {
+  padding: 0.35rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+}
+
+
+/* mantiene consistencia con el resto del modal */
+.location-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.add-location-row,
+.delete-location-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.small-btn {
+  padding: 0.3rem 0.6rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.small-btn.add   { 
+   background-color: #007bff;
+   }  
+
+.small-btn.cancel{ 
+  background-color: #ccc;
+  color:black
+ }  
+ 
+.small-btn.danger{ 
+  background-color: #ccc;
+  color:black
+ }  
+
+.form-select {
+  width: 100%;
+  height: 2.6rem;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border-radius: 6px ;
+}
+
+.form-input {
+  flex: 1;
+  padding: 0.4rem;
+  margin-top: 1rem;
+}
+
+.small-btn.add,
+.small-btn.cancel {
+  width: 2.5rem; /* o 3rem si lo prefieres más ancho */
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+}
+
+.small-btn.add:hover{
+  background-color: #0056b3;
+}
+
+.small-btn.cancel:hover{
+  background-color: #868e96;
+  color:#ffffff
+}
+
+.small-btn.danger:hover{
+  background-color: #868e96;
+  color:#ffffff
+}

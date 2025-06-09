@@ -31,7 +31,7 @@
 
 /* Botones de iconos */
 .icon-button {
-  background: #55aaff;
+   background-color: #007bff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -42,7 +42,7 @@
 }
 
 .icon-button:hover {
-  background-color: #0c7eff;
+  background-color: #0056b3;
   color: #eeeeee;
 }
 
@@ -128,3 +128,4 @@
   cursor: pointer;
   font-weight: bold;
 }
+
