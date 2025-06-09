@@ -1,29 +1,4 @@
-// src/inventory/dto/update-inventory.dto.ts
-import { IsString, IsOptional, IsNumber, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateInventoryDto } from './create-inventory.dto';
 
-export class UpdateInventoryDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  @IsOptional()
-  @Type(() => Number)      
-  @IsNumber()
-  @Min(0)
-  price?: number;
-
-  @IsOptional()
-  @Type(() => Number)      
-  @IsNumber()
-  @Min(0)
-  quantity?: number;
-}
+export class UpdateInventoryDto extends PartialType(CreateInventoryDto) {}

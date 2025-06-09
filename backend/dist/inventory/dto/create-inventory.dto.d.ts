@@ -4,4 +4,5 @@ export declare class CreateInventoryDto {
     location: string;
     price: number;
     quantity: number;
+    imageUrl?: string;
 }

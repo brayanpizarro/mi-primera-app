@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import InventoryTable from '../components/InventoryTable';
 import { InventoryItem } from '../types/InventoryItem';
 import {
@@ -36,30 +36,55 @@ const InventoryPage = () => {
     if (item) setEditingItem(item);
   };
 
+
+
+const handleEditChange = (field: keyof InventoryItem, value: string | number | File) => {
+  
+  setEditingItem(prev =>
+    prev ? { ...prev, [field]: value } : prev
+  );
+};
+
+const handleImageChange = async (file: File) => {
+  try {
+   
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'InventarioECIN'); // ajusta aquí
+
+    const res = await fetch('https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.secure_url) {
+      handleEditChange('imageUrl', data.secure_url); // Actualiza la URL en el estado
+    }
+  } catch (error) {
+    console.error('Error subiendo imagen:', error);
+    alert('No se pudo subir la imagen.');
+  }
+};
+
 const handleSaveEdit = async () => {
   if (!editingItem) return;
 
   const { id, createdAt, ...updateData } = editingItem;
 
   try {
-    await updateInventoryItem(id, updateData);
+    
+    const res = await updateInventoryItem(id, updateData);
     setItems(prev =>
-      prev.map(p => (p.id === id ? editingItem : p))
+      prev.map(p => (p.id === id ? res.data : p))
     );
     setEditingItem(null);
-    setMessage(`El objeto"${editingItem.name}" ha sido actualizado correctamente `);
+    setMessage(`El objeto "${res.data.name}" ha sido actualizado correctamente`);
     setTimeout(() => setMessage(''), 3000);
   } catch (err) {
     console.error('Error al editar:', err);
     alert('No se pudo actualizar el producto.');
   }
 };
-
-  const handleEditChange = (field: keyof InventoryItem, value: string | number) => {
-    setEditingItem(prev =>
-      prev ? { ...prev, [field]: value } : prev
-    );
-  };
 
   // Delete handler con confirmación de cantidad si es > 1
   const onDelete = async (id: number) => {
