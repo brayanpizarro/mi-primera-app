@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InventoryItem } from '../types/InventoryItem';
 import './InventoryTable.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-
 
 interface Props {
   items: InventoryItem[];
@@ -10,41 +9,79 @@ interface Props {
   onDelete: (id: number) => void;
 }
 
-const InventoryTable: React.FC<Props> = ({ items,onEdit, onDelete  }) => {
+const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
+  const [modalImage, setModalImage] = useState<string | null>(null);
+
+  const openModal = (imageUrl: string) => {
+    setModalImage(imageUrl);
+  };
+
+  const closeModal = () => {
+    setModalImage(null);
+  };
+
   return (
-    <table className="centered-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Ubicación</th>
-          <th>Precio</th>
-          <th>Cantidad</th>
-          <th>Fecha de ingreso</th>
-          <th>Modificar</th>
-        </tr>
-      </thead>
-      <tbody>
-        {items.map(item => (
-          <tr key={item.id}>
-            <td>{item.name}</td>
-            <td>{item.description || '-'}</td>
-            <td>{item.location}</td>
-            <td>${item.price.toLocaleString('es-CL')}</td>
-            <td>{item.quantity}</td>
-            <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
-            <td>
+    <>
+      <table className="centered-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Ubicación</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Fecha de ingreso</th>
+            <th>Modificar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map(item => (
+            <tr key={item.id}>
+              <td>
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="inventory-image"
+                    onClick={() => openModal(item.imageUrl!)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                ) : (
+                  'Sin imagen'
+                )}
+              </td>
+              <td>{item.name}</td>
+              <td>{item.description || '-'}</td>
+              <td>{item.location}</td>
+              <td>${item.price.toLocaleString('es-CL')}</td>
+              <td>{item.quantity}</td>
+              <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
+              <td>
                 <button onClick={() => onEdit(item.id)} className="icon-button">
                   <FaEdit />
                 </button>
                 <button onClick={() => onDelete(item.id)} className="icon-button">
-                 <FaTrash />
+                  <FaTrash />
                 </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Modal */}
+      {modalImage && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <img src={modalImage} alt="Imagen grande" />
+            <button className="modal-close-button" onClick={closeModal}>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -1,7 +1,5 @@
-export declare class UpdateInventoryDto {
-    name?: string;
-    description?: string;
-    location?: string;
-    price?: number;
-    quantity?: number;
+import { CreateInventoryDto } from './create-inventory.dto';
+declare const UpdateInventoryDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateInventoryDto>>;
+export declare class UpdateInventoryDto extends UpdateInventoryDto_base {
 }
+export {};

@@ -11,12 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateInventoryDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 class CreateInventoryDto {
     name;
     description;
     location;
     price;
     quantity;
+    imageUrl;
 }
 exports.CreateInventoryDto = CreateInventoryDto;
 __decorate([
@@ -34,10 +36,19 @@ __decorate([
 ], CreateInventoryDto.prototype, "location", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
 ], CreateInventoryDto.prototype, "price", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
 ], CreateInventoryDto.prototype, "quantity", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateInventoryDto.prototype, "imageUrl", void 0);
 //# sourceMappingURL=create-inventory.dto.js.map

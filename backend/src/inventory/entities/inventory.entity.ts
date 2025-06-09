@@ -1,3 +1,4 @@
+// src/inventory/entities/inventory.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
@@ -9,7 +10,7 @@ export class Inventory {
   name: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description?: string;
 
   @Column()
   location: string;
@@ -19,6 +20,10 @@ export class Inventory {
 
   @Column('int')
   quantity: number;
+
+  /** URL segura devuelta por Cloudinary */
+  @Column({ nullable: true })
+  imageUrl?: string;
 
   @CreateDateColumn()
   createdAt: Date;
