@@ -14,3 +14,6 @@ export const updateInventoryQuantity = (id: number, quantity: number) =>
 
 export const updateInventoryItem = (id: number, data: Partial<InventoryItem>) =>
   axios.patch(`${API_URL}/inventory/${id}`, data);
+
+export const createInventoryItem = (data: Partial<InventoryItem>) =>
+  axios.post<InventoryItem>(`${API_URL}/inventory`, data);

@@ -1,0 +1,71 @@
+/* Contenedor de la página */
+.inventory-container {
+  padding: 2rem;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* Título principal */
+.inventory-container h1 {
+  font-size: 2.2rem;
+  color: #212529;
+  margin-bottom: 1.5rem;
+}
+
+.filters-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.filters-container input,
+.filters-container select {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.search-input {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  flex: 1;
+  font-size: 1rem;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.add-button {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #4f94d4;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(79, 148, 212, 0.4);
+  transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #3a78c2;
+}
+
+.add-button:active {
+  transform: scale(0.98);
+}

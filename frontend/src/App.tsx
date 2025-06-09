@@ -5,9 +5,8 @@ const App = () => {
   return (
     <div className="app">
     <Login/>
-   
- 
      {/*<InventoryPage />/*/} 
+
     </div>
   );
 };

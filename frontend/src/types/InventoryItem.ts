@@ -5,5 +5,6 @@ export interface InventoryItem {
   location: string;
   price: number;
   quantity: number;
-  createdAt: string; // viene como string ISO desde la API
+  createdAt: string; 
+  imageUrl?: string;
 }

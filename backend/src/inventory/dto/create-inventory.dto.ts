@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateInventoryDto {
   @IsString()
@@ -12,8 +13,16 @@ export class CreateInventoryDto {
   location: string;
 
   @IsNumber()
+  @Min(0)
+  @Type(() => Number)
   price: number;
 
   @IsNumber()
+  @Min(0)
+  @Type(() => Number)
   quantity: number;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }
