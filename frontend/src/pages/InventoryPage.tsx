@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import InventoryTable from '../components/InventoryTable';
 import { InventoryItem } from '../types/InventoryItem';
 import {
   getInventory,
   updateInventoryItem,
-  addInventoryItem,
+  createInventoryItem,
   deleteInventoryItem
 } from '../services/inventoryService';
-import { isAdmin, getToken } from '../services/authService';
 import EditModal from '../components/EditModal';
 import AddModal from '../components/AddModal';
 import './InventoryPage.css';
 
 const InventoryPage = () => {
-  const navigate = useNavigate();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [addingItem, setAddingItem] = useState(false);
@@ -24,33 +21,19 @@ const InventoryPage = () => {
   const [filter, setFilter] = useState('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const userIsAdmin = isAdmin();
+  const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchInventory = async () => {
-      try {
-        const data = await getInventory();
-        setItems(data);
-      } catch (err) {
-        console.error('Error al cargar inventario:', err);
-        setMessage('Error al cargar el inventario');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInventory();
-  }, [navigate]);
+    getInventory()
+      .then(res => {
+        setItems(res.data);
+      })
+      .catch(err => console.error('Error al cargar inventario:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Edit handlers
   const onEdit = (id: number) => {
-    if (!userIsAdmin) return;
     const item = items.find(i => i.id === id);
     if (item) setEditingItem(item);
   };
@@ -107,7 +90,6 @@ const handleSaveEdit = async () => {
 
   // Delete handler con confirmación de cantidad si es > 1
   const onDelete = async (id: number) => {
-    if (!userIsAdmin) return;
     const item = items.find(i => i.id === id);
     if (!item) return;
 
@@ -188,8 +170,6 @@ const handleSaveEdit = async () => {
       }
     });
 
-  const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
-
   return (
     <div className="inventory-container">
       <h1>Inventario</h1>
@@ -234,11 +214,9 @@ const handleSaveEdit = async () => {
           <option value="desc">Descendente</option>
         </select>
 
-        {userIsAdmin && (
-          <button className="add-button" onClick={() => setAddingItem(true)}>
-            + Agregar Producto
-          </button>
-        )}
+        <button className="add-button" onClick={() => setAddingItem(true)}>
+          + Agregar Producto
+        </button>
       </div>
 
       {loading ? <p>Cargando...</p> : (
@@ -260,7 +238,7 @@ const handleSaveEdit = async () => {
             <AddModal
               onAdd={async (newItem) => {
                 try {
-                  const res = await addInventoryItem(newItem);
+                  const res = await createInventoryItem(newItem);
                   setItems(prev => [...prev, res.data]);
                   setAddingItem(false);
                   setMessage(`"${newItem.name}" agregado correctamente`);

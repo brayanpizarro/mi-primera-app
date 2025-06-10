@@ -1,20 +1,22 @@
 /* src/pages/Login.css */
 .login-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+  padding: 2rem;
 }
 
 .login-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+  padding: 2.5rem;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .login-header {
@@ -23,14 +25,15 @@
 }
 
 .app-title {
-  color: #1a73e8;
   font-size: 2rem;
-  margin-bottom: 0.5rem;
+  color: #1e40af;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
 }
 
 .app-subtitle {
-  color: #5f6368;
-  font-size: 1rem;
+  color: #4b5563;
+  font-size: 0.95rem;
 }
 
 .login-form {
@@ -46,53 +49,55 @@
 }
 
 .form-label {
-  color: #202124;
   font-size: 0.9rem;
+  color: #374151;
   font-weight: 500;
 }
 
 .form-input {
-  padding: 0.75rem;
-  border: 1px solid #dadce0;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .form-input:focus {
-  border-color: #1a73e8;
   outline: none;
-}
-
-.error-message {
-  color: #d93025;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  padding: 0.5rem;
-  background-color: #fce8e6;
-  border-radius: 4px;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  background-color: white;
 }
 
 .submit-button {
-  background-color: #1a73e8;
+  background: linear-gradient(to right, #2563eb, #0284c7);
   color: white;
-  padding: 0.75rem;
+  padding: 0.9rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submit-button:hover {
-  background-color: #1557b0;
+  background: linear-gradient(to right, #1d4ed8, #0369a1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.submit-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.error-message {
+  color: #dc2626;
+  background-color: #fee2e2;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 /* Efecto de vidrio para móviles */
