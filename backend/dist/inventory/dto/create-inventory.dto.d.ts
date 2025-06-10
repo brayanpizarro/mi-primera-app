@@ -5,4 +5,5 @@ export declare class CreateInventoryDto {
     price: number;
     quantity: number;
     imageUrl?: string;
+    customAttributes?: Record<string, any>;
 }

@@ -4,12 +4,23 @@ import { Request } from "express"; // Importar Request de express
 import { jwtConstanst } from '../constants/jwt.constants';
 
 
+/**
+ * Guard de autenticación
+ * @description Protege las rutas verificando la autenticación mediante JWT:
+ * - Extrae el token del header de autorización
+ * - Verifica la validez del token
+ * - Inyecta el payload del token en la request
+ */
 @Injectable()
-export class AuthGuard implements  CanActivate {
+export class AuthGuard implements CanActivate {
+    constructor(private readonly jwtService: JwtService) {}
 
-    constructor(private readonly jwtService: JwtService, // Inyectar el servicio de JWT
-    ) { } // Constructor del guard
-
+    /**
+     * Valida si la petición puede activar la ruta
+     * @param context - Contexto de ejecución de NestJS
+     * @throws UnauthorizedException - Si el token no existe o es inválido
+     * @returns true si la autenticación es exitosa
+     */
     async canActivate(context: ExecutionContext): Promise<boolean>  {
 
         const request = context.switchToHttp().getRequest();// Obtener la solicitud HTTP
@@ -29,6 +40,12 @@ export class AuthGuard implements  CanActivate {
         }
           return true;
     }
+
+    /**
+     * Extrae el token JWT del header de autorización
+     * @param request - Objeto Request de Express
+     * @returns Token extraído o undefined si no existe
+     */
     private extractTokenFromHeader(request: Request): string | undefined { // Método para extraer el token del encabezado de autorización
         const [type, token] = request.headers.authorization?.split(' ') ?? [];// Dividir el encabezado de autorización en tipo y token
         return type === 'Bearer' ? token : undefined;// Verificar si el tipo es Bearer

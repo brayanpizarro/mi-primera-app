@@ -19,6 +19,7 @@ let Inventory = class Inventory {
     price;
     quantity;
     imageUrl;
+    customAttributes;
     createdAt;
 };
 exports.Inventory = Inventory;
@@ -50,6 +51,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Inventory.prototype, "imageUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", Object)
+], Inventory.prototype, "customAttributes", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
