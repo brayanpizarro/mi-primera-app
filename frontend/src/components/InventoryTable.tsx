@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { InventoryItem } from '../types/InventoryItem';
-import './InventoryTable.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png'
+import './InventoryTable.css';
+import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png';
+import { isAdmin } from '../services/authService';
 
 interface Props {
   items: InventoryItem[];
@@ -12,6 +13,7 @@ interface Props {
 
 const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
   const [modalImage, setModalImage] = useState<string | null>(null);
+  const userIsAdmin = isAdmin();
 
   const openModal = (imageUrl: string) => {
     setModalImage(imageUrl);
@@ -23,17 +25,17 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
 
   return (
     <>
-      <table className="centered-table">
+      <table className="inventory-table">
         <thead>
           <tr>
-            <th></th>
+            <th>Imagen</th>
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Ubicación</th>
             <th>Precio</th>
             <th>Cantidad</th>
-            <th>Fecha de ingreso</th>
-            <th>Modificar</th>
+            <th>Fecha de Creación</th>
+            {userIsAdmin && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -54,27 +56,25 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
               <td>${item.price.toLocaleString('es-CL')}</td>
               <td>{item.quantity}</td>
               <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
-              <td>
-                <button onClick={() => onEdit(item.id)} className="icon-button">
-                  <FaEdit />
-                </button>
-                <button onClick={() => onDelete(item.id)} className="icon-button">
-                  <FaTrash />
-                </button>
-              </td>
+              {userIsAdmin && (
+                <td>
+                  <button onClick={() => onEdit(item.id)} className="icon-button">
+                    <FaEdit />
+                  </button>
+                  <button onClick={() => onDelete(item.id)} className="icon-button">
+                    <FaTrash />
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Modal */}
       {modalImage && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <img src={modalImage} alt="Imagen grande" />
-            <button className="modal-close-button" onClick={closeModal}>
-              ×
-            </button>
+          <div className="modal-content">
+            <img src={modalImage} alt="Vista ampliada" />
           </div>
         </div>
       )}

@@ -6,5 +6,6 @@ export declare class Inventory {
     price: number;
     quantity: number;
     imageUrl?: string;
+    customAttributes?: Record<string, any>;
     createdAt: Date;
 }

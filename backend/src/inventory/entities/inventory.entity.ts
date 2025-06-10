@@ -25,6 +25,9 @@ export class Inventory {
   @Column({ nullable: true })
   imageUrl?: string;
 
+  @Column('json', { nullable: true })
+  customAttributes?: Record<string, any>;
+
   @CreateDateColumn()
   createdAt: Date;
 }

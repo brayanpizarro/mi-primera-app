@@ -7,4 +7,5 @@ export interface InventoryItem {
   quantity: number;
   createdAt: string; 
   imageUrl?: string;
+  customAttributes?: Record<string, any>;
 }
