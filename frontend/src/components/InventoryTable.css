@@ -1,21 +1,23 @@
+/* InventoryTable.css */
+
 /* Tabla principal */
-.centered-table {
+.inventory-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 0.5rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.centered-table th {
-  background-color: #f8f9fa;
+.inventory-table th {
+  background-color: #007bff;
   padding: 1rem;
   text-align: center;
   font-weight: bold;
-  color: #343a40;
-  border-bottom: 2px solid #dee2e6;
+  color: #ffffff;
+  border-bottom: 2px solid #ffffff;
 }
 
-.centered-table td {
+.inventory-table td {
   background-color: #fff;
   padding: 1rem;
   text-align: center;
@@ -23,55 +25,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
-/* Fila de datos al pasar el mouse */
-.centered-table tbody tr:hover td {
+.inventory-table tbody tr:hover td {
   background-color: #f1f3f5;
   transition: background-color 0.2s ease-in-out;
 }
 
-/* Botones de iconos */
-.icon-button {
-   background-color: #007bff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  margin: 0 0.3rem;
-  padding: 0.4rem 0.6rem;
-  transition: background-color 0.2s;
-}
-
-.icon-button:hover {
-  background-color: #0056b3;
-  color: #eeeeee;
-}
-
-/* Animación al entrar mensaje */
-.success-message {
-  margin-bottom: 1rem;
-  padding: 0.9rem 1.2rem;
-  background-color: #d1e7dd;
-  color: #0f5132;
-  border: 1px solid #badbcc;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-/* Animación para mensajes */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.inventory-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 4px; 
-}
-
-.inventory-image {
+/* Imagen */
+.inventory-item-image {
   width: 100px;
   height: 100px;
   object-fit: cover;
@@ -79,12 +39,86 @@
   transition: transform 0.2s ease;
 }
 
-.inventory-image:hover {
+.inventory-item-image:hover {
   transform: scale(1.05);
   cursor: pointer;
 }
 
-.modal-overlay {
+/* Botones de iconos */
+.inventory-icon-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin: 0.3rem 0.3rem;
+  padding: 0.4rem 0.6rem;
+  transition: background-color 0.2s;
+}
+
+.inventory-icon-button:hover {
+  background-color: #0056b3;
+  color: #eeeeee;
+}
+
+/* Input para cantidad */
+.inventory-qty-input {
+  width: 4rem;
+  padding: 0.3rem;
+  text-align: center;
+  border: 1px solid #888;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+}
+
+/* Modo eliminar - disposición en columna */
+.inventory-delete-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inventory-delete-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+}
+
+/* Botones de confirmación y cancelación */
+.inventory-confirm-btn,
+.inventory-cancel-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+}
+
+.inventory-confirm-btn {
+  background-color: #e92f2f;
+  color: white;
+}
+
+.inventory-confirm-btn:hover {
+  background-color: #921100;
+}
+
+.inventory-cancel-btn {
+  background-color: #ccc;
+  color: rgb(0, 0, 0);
+}
+
+.inventory-cancel-btn:hover {
+  background-color: #868e96;
+
+}
+
+/* Modal */
+.inventory-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -97,7 +131,7 @@
   z-index: 9999;
 }
 
-.modal-content {
+.inventory-modal-content {
   position: relative;
   background: white;
   padding: 1rem;
@@ -108,15 +142,15 @@
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
-.modal-content img {
-  max-width: 100%;
+.inventory-modal-content img {
+  max-width: 85%;
   max-height: 80vh;
   border-radius: 6px;
   display: block;
   margin: 0 auto;
 }
 
-.modal-close-button {
+.inventory-modal-close-button {
   position: absolute;
   top: 0.2rem;
   right: 0.4rem;
@@ -128,4 +162,3 @@
   cursor: pointer;
   font-weight: bold;
 }
-

@@ -18,8 +18,9 @@ let Inventory = class Inventory {
     location;
     price;
     quantity;
-    imageUrl;
+    status;
     customAttributes;
+    imageUrl;
     createdAt;
 };
 exports.Inventory = Inventory;
@@ -40,7 +41,7 @@ __decorate([
     __metadata("design:type", String)
 ], Inventory.prototype, "location", void 0);
 __decorate([
-    (0, typeorm_1.Column)('decimal'),
+    (0, typeorm_1.Column)({ type: 'decimal', nullable: true }),
     __metadata("design:type", Number)
 ], Inventory.prototype, "price", void 0);
 __decorate([
@@ -50,11 +51,15 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
-], Inventory.prototype, "imageUrl", void 0);
+], Inventory.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.Column)('json', { nullable: true }),
     __metadata("design:type", Object)
 ], Inventory.prototype, "customAttributes", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Inventory.prototype, "imageUrl", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

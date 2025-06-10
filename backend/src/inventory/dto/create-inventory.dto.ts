@@ -24,6 +24,10 @@ export class CreateInventoryDto {
 
   @IsOptional()
   @IsString()
+  status: string;
+  
+  @IsOptional()
+  @IsString()
   imageUrl?: string;
 
   @IsOptional()
