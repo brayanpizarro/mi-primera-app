@@ -21,7 +21,7 @@ export class UserSeeder {
       const adminPassword = await bcryptjs.hash('admin123', 10);
         const admin = this.userRepository.create({
         name: 'Administrador',
-        email: 'admin@admin.com',
+        email: 'admin@ucn.cl',
         password: adminPassword,
         rut: '11.111.111-1',
         role: UserRole.ADMIN,
@@ -29,7 +29,7 @@ export class UserSeeder {
 
       await this.userRepository.save(admin);
       console.log('Usuario administrador creado con éxito');
-      console.log('Email: admin@admin.com');
+      console.log('Email: admin@ucn.com');
       console.log('Contraseña: admin123');
       console.log('RUT: 11.111.111-1');
     }

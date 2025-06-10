@@ -30,7 +30,6 @@ let InventoryController = class InventoryController {
         return this.inventoryService.create(dto);
     }
     findAll(filter) {
-        console.log('Objetos de inventario:');
         return this.inventoryService.findAll(filter);
     }
     findOne(id) {

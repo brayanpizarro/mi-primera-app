@@ -5,6 +5,15 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstanst } from './constants/jwt.constants'; // Importar constantes de JWT
 
+/**
+ * Módulo de autenticación
+ * @description Configura y proporciona todas las funcionalidades de autenticación:
+ * - Integración con JWT para tokens de autenticación
+ * - Configuración global del módulo JWT
+ * - Importación del módulo de usuarios
+ * - Tiempo de expiración de tokens configurado a 1 día
+ * - Controladores y servicios de autenticación
+ */
 @Module({
   imports: [
     UsersModule,
