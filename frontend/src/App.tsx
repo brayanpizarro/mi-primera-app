@@ -4,21 +4,26 @@ import InventoryPageUser from './pages/InvetoryPageUser'
 import Login from './pages/Login';
 import RegisterUser from './pages/RegisterUser';
 import ProtectedRoute from './components/ProtectedRoute';
+import { UserProvider } from './context/UserContext';
+import Navbar from './components/Navbar';
 
 function App() {
-   return (
-    <Router>
-      <Routes>
-        {/* Rutas públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<RegisterUser />} />
+  return (
+    <UserProvider>
+      <Router>
+        <Navbar />
+        <div className="app-container">
+          <Routes>
+            {/* Rutas públicas */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterUser />} />
 
-        {/* Rutas protegidas para admin */}
-        <Route path="/inventory" element={
-          <ProtectedRoute requiredRole="admin">
-            <InventoryPage />
-          </ProtectedRoute>
-        } />
+            {/* Rutas protegidas para admin */}
+            <Route path="/inventory" element={
+              <ProtectedRoute requiredRole="admin">
+                <InventoryPage />
+              </ProtectedRoute>
+            } />
 
         {/* Rutas protegidas para cualquier usuario autenticado */}
         <Route path="/inventoryUser" element={
@@ -27,9 +32,11 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* Otras rutas protegidas pueden agregarse aquí */}
-      </Routes>
-    </Router>
+            {/* Otras rutas protegidas pueden agregarse aquí */}
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 

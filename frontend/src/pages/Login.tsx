@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 import './Login.css';
 import axios from 'axios';
 import ucnLogo from '../assets/ucnLogo-b0e5fe78.png';
@@ -8,8 +9,8 @@ const Login = () => {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);  const navigate = useNavigate();
+  const { login } = useContext(UserContext);
 
   const formatRut = (rut: string) => {
     // Eliminar puntos y guión existentes
@@ -34,13 +35,13 @@ const Login = () => {
       const response = await axios.post('http://localhost:3000/api/v1/auth/login', {
         rut: formattedRut,
         password
-      });
-
-      // Guardar el token y la información del usuario
+      });      // Guardar el token y la información del usuario
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Usar el contexto para guardar la información del usuario
+      login(response.data.user);
 
-      // Redirigir según el rol (ahora en minúscula)
+      // Redirigir según el rol
       if (response.data.user.role === 'admin') {
         navigate('/inventory');
       } else {

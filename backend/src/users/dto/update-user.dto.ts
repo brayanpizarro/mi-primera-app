@@ -8,17 +8,16 @@ export class UpdateUserDto {
     name?: string; // Nombre del usuario
     
     @IsString()
+    @MinLength(6)
     @IsOptional()
-    email?: string; // Correo electrónico del usuario
+    currentPassword?: string; // Contraseña actual para validación
     
     @IsString()
+    @MinLength(6)
     @IsOptional()
-    rut?: string; // Rut del usuario
-
-    @IsString()
-    @IsOptional()
-    password?: string; // Contraseña del usuario
+    newPassword?: string; // Nueva contraseña
     
     @IsEnum(UserRole)
-    role: UserRole;
+    @IsOptional()
+    role?: UserRole; // Rol del usuario
 }
