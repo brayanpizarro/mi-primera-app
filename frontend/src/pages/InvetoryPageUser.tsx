@@ -3,6 +3,7 @@ import InventoryTableUser from '../components/InventoryTableUser';
 import { InventoryItem } from '../types/InventoryItem';
 import { getInventory } from '../services/inventoryService';
 import './InventoryPageUser.css';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 const InventoryPageUser = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -13,6 +14,7 @@ const InventoryPageUser = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedLocation, setSelectedLocation] = useState('');
   const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
+  const navigate = useNavigate(); // Obtén la función navigate
 
   useEffect(() => {
     getInventory()
@@ -22,7 +24,12 @@ const InventoryPageUser = () => {
       .catch(err => console.error('Error al cargar inventario:', err))
       .finally(() => setLoading(false));
   }, []);
-
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login'); // Redirige al login
+  };
   // Filtro y búsqueda
   const filteredItems = items
     .filter(item =>
@@ -47,7 +54,12 @@ const InventoryPageUser = () => {
 
   return (
     <div className="inventory-container">
-      <h1>INVENTARIO</h1>
+      <div className="header-container">
+        <h1>INVENTARIO</h1>
+        <button onClick={handleLogout} className="logout-button">
+          Cerrar sesión
+        </button>
+      </div>
       {message && <div className="success-message">{message}</div>}
 
       <div className="controls">

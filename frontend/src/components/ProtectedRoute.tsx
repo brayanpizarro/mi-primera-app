@@ -6,8 +6,22 @@ interface ProtectedRouteProps {
   requiredRole?: 'user' | 'admin';
 }
 
+interface User {
+  role: 'user' | 'admin';
+  // otras propiedades del usuario si las hay
+}
+
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  // Mejor manejo del usuario en localStorage
+  let user: User | null = null;
+  try {
+    const userData = localStorage.getItem('user');
+    user = userData ? JSON.parse(userData) : null;
+  } catch (error) {
+    console.error('Error parsing user data', error);
+    user = null;
+  }
+
   const token = localStorage.getItem('token');
 
   if (!token || !user) {
@@ -19,7 +33,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     // Usuario no tiene el rol requerido
     return <Navigate to="/unauthorized" replace />;
   }
-
+ 
   return children;
 };
 
