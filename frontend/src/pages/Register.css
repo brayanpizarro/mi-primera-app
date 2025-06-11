@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #4191a8 0%, #175674 100%);
   padding: 2rem;
 }
 
@@ -106,4 +106,35 @@
     backdrop-filter: none;
     background-color: rgba(255, 255, 255, 0.98);
   }
+}
+.role-buttons-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.role-button {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.role-button:hover {
+  background-color: #e9ecef;
+}
+
+.role-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.role-button.active:hover {
+  background-color: #0069d9;
 }

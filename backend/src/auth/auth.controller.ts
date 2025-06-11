@@ -16,7 +16,7 @@ export class AuthController {
         registerDto:RegisterDto,
     ){
         return this.authService.register(registerDto); // Llama al servicio de autenticación para registrar un nuevo usuario
-     }
+    }
 
     @Post('login')
     login(
