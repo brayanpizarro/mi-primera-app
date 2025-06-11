@@ -2,10 +2,28 @@
 .register-wrapper {
   min-height: 100vh;
   display: flex;
+  flex-direction: column; /* Cambiado para logos arriba */
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #4191a8 0%, #175674 100%);
   padding: 2rem;
+}
+
+/* Nuevos estilos para logos (igual que login) */
+.logos-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.institution-logo {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
 }
 
 .register-container {
@@ -70,6 +88,15 @@
   background-color: white;
 }
 
+/* Validación visual */
+.form-input:invalid:not(:placeholder-shown) {
+  border-color: #f87171;
+}
+
+.form-input:valid:not(:placeholder-shown) {
+  border-color: #34d399;
+}
+
 .submit-button {
   background: linear-gradient(to right, #2563eb, #0284c7);
   color: white;
@@ -90,51 +117,89 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Validación visual */
-.form-input:invalid:not(:placeholder-shown) {
-  border-color: #f87171;
+.error-message {
+  color: #dc2626;
+  background-color: #fee2e2;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-.form-input:valid:not(:placeholder-shown) {
-  border-color: #34d399;
+.login-redirect {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #7f8c8d;
 }
 
-/* Efecto de vidrio para móviles */
+.login-link {
+  color: #3498db;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* Botones de rol mejorados */
+.role-buttons-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.role-button {
+  flex: 1;
+  padding: 0.7rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.role-button:hover {
+  background-color: #e5e7eb;
+}
+
+.role-button.active {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .institution-logo {
+    height: 40px;
+  }
+  
+  .logos-container {
+    gap: 1rem;
+  }
+  
+  .role-buttons-container {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 480px) {
   .register-container {
     padding: 1.8rem;
     backdrop-filter: none;
     background-color: rgba(255, 255, 255, 0.98);
   }
-}
-.role-buttons-container {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.role-button {
-  flex: 1;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.role-button:hover {
-  background-color: #e9ecef;
-}
-
-.role-button.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.role-button.active:hover {
-  background-color: #0069d9;
+  
+  .institution-logo {
+    height: 35px;
+  }
+  
+  .app-title {
+    font-size: 1.6rem;
+  }
 }

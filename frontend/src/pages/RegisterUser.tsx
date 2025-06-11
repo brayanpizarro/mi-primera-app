@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Register.css';
 import axios from 'axios';
+import ucnLogo from '../assets/ucnLogo-b0e5fe78.png';
+import eicLogo from '../assets/eicLogo-586fa087.png';
+
 
 const RegisterUser = () => {
   const [formData, setFormData] = useState({
@@ -90,6 +93,12 @@ const RegisterUser = () => {
 
   return (
     <div className="register-wrapper">
+      {/* Contenedor de logos agregado */}
+      <div className="logos-container">
+        <img src={ucnLogo} alt="Universidad Católica del Norte" className="institution-logo" />
+        <img src={eicLogo} alt="Escuela de Ingeniería y Ciencias" className="institution-logo" />
+      </div>
+
       <div className="register-container">
         <div className="register-header">
           <h2 className="app-title">Crear Cuenta</h2>
@@ -182,15 +191,7 @@ const RegisterUser = () => {
             {isLoading ? 'Registrando...' : 'Registrarse'}
           </button>
 
-          <div className="login-redirect">
-            ¿Ya tienes una cuenta?{' '}
-            <span 
-              className="login-link" 
-              onClick={() => navigate('/login')}
-            >
-              Inicia sesión aquí
-            </span>
-          </div>
+          
         </form>
       </div>
     </div>
