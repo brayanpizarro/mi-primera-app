@@ -1,15 +1,29 @@
-.inventory-container {
+.backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.inventory-container {
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  padding: 2rem;
+  margin: auto;
+  position: relative; /* para elementos dentro */
+  /* quitar backdrop-filter de aquí */
 }
+
 
 .inventory-container h1 {
   color: #1e40af;
