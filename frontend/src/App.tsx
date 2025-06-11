@@ -22,7 +22,7 @@ function App() {
 
         {/* Rutas protegidas para cualquier usuario autenticado */}
         <Route path="/inventoryUser" element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="user">
             <InventoryPageUser />
           </ProtectedRoute>
         } />
