@@ -123,6 +123,19 @@
   border: 1px solid #ccc;
 }
 
+.small-btn.dangerattr{ 
+  background-color: #ccc;
+  color:black;
+  margin-bottom: 1rem;
+  width: 4rem;
+  height: 2rem;
+ }  
+
+ .small-btn.dangerattr:hover{ 
+  background-color: #868e96;
+  color:#ffffff
+ }  
+
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -193,3 +206,12 @@
 .modal-buttons button.cancel {
   background-color: #ccc;
 }
+
+.attr-row-edit  {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+

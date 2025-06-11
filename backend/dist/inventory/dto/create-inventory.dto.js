@@ -18,7 +18,9 @@ class CreateInventoryDto {
     location;
     price;
     quantity;
+    status;
     imageUrl;
+    customAttributes;
 }
 exports.CreateInventoryDto = CreateInventoryDto;
 __decorate([
@@ -50,5 +52,15 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
+], CreateInventoryDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
 ], CreateInventoryDto.prototype, "imageUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsObject)(),
+    __metadata("design:type", Object)
+], CreateInventoryDto.prototype, "customAttributes", void 0);
 //# sourceMappingURL=create-inventory.dto.js.map

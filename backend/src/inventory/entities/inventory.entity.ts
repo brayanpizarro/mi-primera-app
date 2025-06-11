@@ -15,13 +15,18 @@ export class Inventory {
   @Column()
   location: string;
 
-  @Column('decimal')
+  @Column({ type: 'decimal', nullable: true })
   price: number;
 
   @Column('int')
   quantity: number;
 
-  /** URL segura devuelta por Cloudinary */
+  @Column({nullable: true})
+  status: string;
+
+  @Column('json', { nullable: true })
+  customAttributes?: Record<string, any>;
+
   @Column({ nullable: true })
   imageUrl?: string;
 

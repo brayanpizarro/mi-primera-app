@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { UserSeeder } from './users/seeders/user.seeder';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
@@ -18,6 +20,10 @@ async function bootstrap() {
     })
   );
   
+  // Ejecutar el seeder
+  const userSeeder = app.get(UserSeeder);
+  await userSeeder.seed();
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

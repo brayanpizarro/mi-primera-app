@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// AddModal.tsx
+import React, { useEffect, useState } from 'react';
 import './AddModal.css';
 import { InventoryItem } from '../types/InventoryItem';
 
@@ -8,63 +9,73 @@ interface Props {
 }
 
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload';
-const UPLOAD_PRESET = 'InventarioECIN';
+const UPLOAD_PRESET   = 'InventarioECIN';
 
 const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
-  const [name, setName] = useState('');
+  /* ---------------- estado principal ---------------- */
+  const [name,        setName]        = useState('');
   const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [price, setPrice] = useState<number | ''>('');
-  const [quantity, setQuantity] = useState<number | ''>('');
-  const [image, setImage] = useState<File | null>(null);
+  const [location,    setLocation]    = useState('');
+  const [price,       setPrice]       = useState<number | ''>('');
+  const [quantity,    setQuantity]    = useState<number | ''>('');
+  const [status,      setStatus]       = useState('');
+  const [image,       setImage]       = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [show, setShow] = useState(false);
-  const [showDeleteSelect, setShowDeleteSelect] = useState(false);
+  const [uploading,   setUploading]   = useState(false);
+  const [show,        setShow]        = useState(false);
 
-  const [locations, setLocations] = useState<string[]>(() => {
-    const saved = localStorage.getItem('locations');
-    return saved ? JSON.parse(saved) : [];
-  });
+  /* ---------------- ubicaciones ---------------- */
+  const [locations,   setLocations]   = useState<string[]>(() =>
+    JSON.parse(localStorage.getItem('locations') || '[]')
+  );
+  const [newLocation,           setNewLocation]           = useState('');
+  const [showNewLocationInput,  setShowNewLocationInput]  = useState(false);
+  const [showDeleteSelect,      setShowDeleteSelect]      = useState(false);
 
-  const [newLocation, setNewLocation] = useState('');
-  const [showNewLocationInput, setShowNewLocationInput] = useState(false);
+  /* ---------------- estados ---------------- */
+  const [statuses,             setStatuses]             = useState<string[]>(() =>
+    JSON.parse(localStorage.getItem('statuses') || '[]')
+  );
+  const [newStatus,           setNewStatus]             = useState('');
+  const [showNewStatusInput,  setShowNewStatusInput]    = useState(false);
+  const [showDeleteStatus,    setShowDeleteStatus]      = useState(false);
 
-  useEffect(() => {
-    setShow(true);
-  }, []);
+  /* ---------------- atributos extra ---------------- */
+  const [attrs, setAttrs] = useState<{ key: string; value: string }[]>([]);
+  const addAttrField      = () => setAttrs(prev => [...prev, { key: '', value: '' }]);
+  const rmAttrField       = (i: number) => setAttrs(prev => prev.filter((_, idx) => idx !== i));
 
-  useEffect(() => {
-    localStorage.setItem('locations', JSON.stringify(locations));
-  }, [locations]);
+  /* ---------------- efectos ---------------- */
+  useEffect(() => setShow(true), []);
+  useEffect(() => localStorage.setItem('locations', JSON.stringify(locations)), [locations]);
+  useEffect(() => localStorage.setItem('statuses', JSON.stringify(statuses)), [statuses]);
 
+  /* ---------------- handlers ---------------- */
   const handleAddLocation = () => {
     const trimmed = newLocation.trim();
     if (!trimmed) return;
-    if (locations.includes(trimmed)) {
-      alert('La ubicación ya existe.');
-      return;
-    }
+    if (locations.includes(trimmed)) { alert('La ubicación ya existe.'); return; }
     setLocations(prev => [...prev, trimmed]);
     setLocation(trimmed);
     setNewLocation('');
     setShowNewLocationInput(false);
   };
 
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setImage(e.target.files[0]);
       setImagePreview(URL.createObjectURL(e.target.files[0]));
     }
   };
 
-  const validate = () => {
-    if (!name.trim()) return alert('El nombre es obligatorio'), false;
-    if (price === '' || price < 0) return alert('El precio debe ser ≥ 0'), false;
-    if (quantity === '' || quantity < 0) return alert('La cantidad debe ser ≥ 0'), false;
-    if (!location) return alert('Debe seleccionar una ubicación'), false;
-    return true;
+  const handleAddStatus = () => {
+    const trimmed = newStatus.trim();
+    if (!trimmed) return;
+    if (statuses.includes(trimmed)) { alert('El estado ya existe.'); return; }
+    setStatuses(prev => [...prev, trimmed]);
+    setStatus(trimmed);
+    setNewStatus('');
+    setShowNewStatusInput(false);
   };
 
   const uploadToCloudinary = async () => {
@@ -74,177 +85,211 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
     formData.append('upload_preset', UPLOAD_PRESET);
     setUploading(true);
     try {
-      const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+      const res  = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
       const data = await res.json();
       return data.secure_url;
-    } catch (error) {
+    } catch {
       alert('Error al subir la imagen');
       return '';
-    } finally {
-      setUploading(false);
-    }
+    } finally { setUploading(false); }
+  };
+
+  const validate = () => {
+    if (!name.trim())                          return alert('El nombre es obligatorio');
+    if (price === ''   || Number(price)   < 0) return alert('El precio debe ser ≥ 0');
+    if (quantity === ''|| Number(quantity)< 0) return alert('La cantidad debe ser ≥ 0');
+    if (!location)                             return alert('Debe seleccionar una ubicación');
+    return true;
   };
 
   const handleAdd = async () => {
     if (!validate()) return;
-
     const imageUrl = await uploadToCloudinary();
 
-    onAdd({
-      name: name.trim(),
-      description: description.trim(),
-      location: location.trim(),
-      price: Number(price),
-      quantity: Number(quantity),
-      imageUrl,
+    /* convertir attrs a objeto */
+    const customAttributes: Record<string,string> = {};
+    attrs.forEach(({ key, value }) => {
+      if (key.trim()) customAttributes[key.trim()] = value;
     });
 
-    setName('');
-    setDescription('');
-    setLocation('');
-    setPrice('');
-    setQuantity('');
-    setImage(null);
-    setImagePreview('');
+    onAdd({
+      name:        name.trim(),
+      description: description.trim(),
+      location:    location.trim(),
+      price:       Number(price),
+      quantity:    Number(quantity),
+      status:      status.trim(),
+      imageUrl,
+      customAttributes: Object.keys(customAttributes).length ? customAttributes : undefined,
+    });
+
+    /* limpiar */
+    setName(''); setDescription(''); setLocation('');
+    setPrice(''); setQuantity(''); setImage(null);
+    setStatus('');setImagePreview(''); setAttrs([]);
   };
 
   const handleClose = () => {
     setShow(false);
-    setTimeout(() => onCancel(), 300);
+    setTimeout(onCancel, 300);
   };
 
+ 
   return (
     <div className={`modal-backdrop ${show ? 'show' : 'hide'}`}>
       <div className={`modal-content ${show ? 'show' : 'hide'}`}>
         <h2>Agregar nuevo producto</h2>
 
-        <label>
-          Nombre:
+        
+        <label>Nombre:
           <input value={name} onChange={e => setName(e.target.value)} />
         </label>
 
-        <label>
-          Descripción:
+        <label>Descripción:
           <textarea value={description} onChange={e => setDescription(e.target.value)} />
         </label>
 
-
+        {/* ---- ubicación y controles ---- */}
         <label className="form-label">Ubicación:</label>
+        <select className="form-select" value={location} onChange={e => setLocation(e.target.value)}>
+          <option value="">-- Seleccione una ubicación --</option>
+          {locations.map(loc => <option key={loc}>{loc}</option>)}
+        </select>
 
-        {/* select principal */}
-        <label>
-          <select
-            className="form-select"
-            value={location}
-            onChange={e => setLocation(e.target.value)}
-          >
-            <option value="">-- Seleccione una ubicación --</option>
-            {locations.map(loc => (
-              <option key={loc} value={loc}>{loc}</option>
-            ))}
-          </select>
-        </label>
-
-        {/* BOTONES de acción (misma línea, estilo uniforme) */}
-       <div className="location-buttons">
+        <div className="location-buttons">
           <button
             type="button"
             className="small-btn"
-            onClick={() => {
-              setShowNewLocationInput(prev => {
-                if (!prev) setShowDeleteSelect(false);
-                return !prev;
-              });
-            }}
-          >
-            {showNewLocationInput ? 'Cancelar' : 'Agregar ubicación'}
-          </button>
+            onClick={() => { setShowNewLocationInput(!showNewLocationInput); setShowDeleteSelect(false); }}
+          >{showNewLocationInput ? 'Cancelar' : 'Agregar ubicación'}</button>
 
           <button
             type="button"
             className="small-btn danger"
-            onClick={() => {
-              setShowDeleteSelect(prev => {
-                if (!prev) setShowNewLocationInput(false);
-                return !prev;
-              });
-            }}
-          >
-            {showDeleteSelect ? 'Cancelar' : 'Eliminar ubicación'}
-          </button>
+            onClick={() => { setShowDeleteSelect(!showDeleteSelect);   setShowNewLocationInput(false); }}
+          >{showDeleteSelect ? 'Cancelar' : 'Eliminar ubicación'}</button>
         </div>
 
-        {/* INPUT para agregar nueva ubicación */}
         {showNewLocationInput && (
           <div className="add-location-row">
-            <input
-              className="form-input"
+            <input className="form-input"
               value={newLocation}
               onChange={e => setNewLocation(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddLocation(); } }}
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddLocation())}
               placeholder="Nueva ubicación"
             />
-            <button type="button" className="small-btn add" onClick={handleAddLocation}>+</button>
-            <button type="button" className="small-btn cancel" onClick={() => setShowNewLocationInput(false)}>×</button>
+            <button className="small-btn add"    onClick={handleAddLocation}>+</button>
+            <button className="small-btn cancel" onClick={() => setShowNewLocationInput(false)}>×</button>
           </div>
         )}
 
-        {/* SELECT para elegir qué ubicación eliminar */}
-        {showDeleteSelect && locations.length > 0 && (
+        {showDeleteSelect && !!locations.length && (
           <div className="delete-location-row">
-            <select
-              className="form-select"
-              defaultValue=""
+            <select className="form-select" defaultValue=""
               onChange={e => {
                 const toDelete = e.target.value;
                 if (toDelete && window.confirm(`¿Eliminar la ubicación "${toDelete}"?`)) {
                   setLocations(prev => prev.filter(l => l !== toDelete));
                   if (location === toDelete) setLocation('');
                 }
-              }}
-            >
+              }}>
               <option value="">-- Seleccione para eliminar --</option>
-              {locations.map(loc => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
+              {locations.map(loc => <option key={loc}>{loc}</option>)}
             </select>
           </div>
         )}
 
 
-
-
-        <label>
-          Precio:
-          <input
-            type="number"
-            min="0"
-            value={price}
-            onChange={e => setPrice(Number(e.target.value))}
-          />
+       
+        <label>Precio:
+          <input type="number" min="0" value={price} onChange={e => setPrice(Number(e.target.value))} />
         </label>
 
-        <label>
-          Cantidad:
-          <input
-            type="number"
-            min="0"
-            value={quantity}
-            onChange={e => setQuantity(Number(e.target.value))}
-          />
+        <label>Cantidad:
+          <input type="number" min="0" value={quantity} onChange={e => setQuantity(Number(e.target.value))} />
         </label>
 
-        <label>
-          Imagen:
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-        </label>
+        {/* ---- estado y controles ---- */}
+        <label className="form-label">Estado:</label>
+        <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
+          <option value="">-- Seleccione un estado --</option>
+          {statuses.map(st => <option key={st}>{st}</option>)}
+        </select>
 
-        {imagePreview && (
-          <div className="image-preview">
-            <img src={imagePreview} alt="Vista previa" />
+        <div className="location-buttons">
+          <button
+            type="button"
+            className="small-btn"
+            onClick={() => { setShowNewStatusInput(!showNewStatusInput); setShowDeleteStatus(false); }}
+          >{showNewStatusInput ? 'Cancelar' : 'Agregar estado'}</button>
+
+          <button
+            type="button"
+            className="small-btn danger"
+            onClick={() => { setShowDeleteStatus(!showDeleteStatus); setShowNewStatusInput(false); }}
+          >{showDeleteStatus ? 'Cancelar' : 'Eliminar estado'}</button>
+        </div>
+
+        {showNewStatusInput && (
+          <div className="add-location-row">
+            <input className="form-input"
+              value={newStatus}
+              onChange={e => setNewStatus(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddStatus())}
+              placeholder="Nuevo estado"
+            />
+            <button className="small-btn add"    onClick={handleAddStatus}>+</button>
+            <button className="small-btn cancel" onClick={() => setShowNewStatusInput(false)}>×</button>
           </div>
         )}
 
+        {showDeleteStatus && !!statuses.length && (
+          <div className="delete-location-row">
+            <select className="form-select" defaultValue=""
+              onChange={e => {
+                const toDelete = e.target.value;
+                if (toDelete && window.confirm(`¿Eliminar el estado "${toDelete}"?`)) {
+                  setStatuses(prev => prev.filter(s => s !== toDelete));
+                  if (status === toDelete) setStatus('');
+                }
+              }}>
+              <option value="">-- Seleccione para eliminar --</option>
+              {statuses.map(st => <option key={st}>{st}</option>)}
+            </select>
+          </div>
+        )}
+
+
+                {/* ---- atributos extra ---- */}
+        <label className="form-label" style={{ marginTop: '1rem' }}>Atributos extra:</label>
+        {attrs.map((attr, idx) => (
+          <div key={idx} className="attr-row">
+            <input
+              className="attr-input" placeholder="Atributo"
+              value={attr.key}
+              onChange={e => {
+                const v = e.target.value;
+                setAttrs(prev => prev.map((a, i) => i === idx ? { ...a, key: v } : a));
+              }}
+            />
+            <input
+              className="attr-input" placeholder="Valor"
+              value={attr.value}
+              onChange={e => {
+                const v = e.target.value;
+                setAttrs(prev => prev.map((a, i) => i === idx ? { ...a, value: v } : a));
+              }}
+            />
+            <button className="small-btn cancel" onClick={() => rmAttrField(idx)}>×</button>
+          </div>
+        ))}
+        <button type="button" className="small-btn add" onClick={addAttrField}>+</button>
+
+        <label>Imagen:
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+        </label>
+
+        {imagePreview && <div className="image-preview"><img src={imagePreview} /></div>}
         {uploading && <p>Subiendo imagen...</p>}
 
         <div className="modal-buttons">

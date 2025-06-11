@@ -6,6 +6,14 @@ import * as bcryptjs from 'bcryptjs'; // Importar bcrypt para encriptar contrase
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 
+/**
+ * Servicio de autenticación
+ * @description Maneja toda la lógica de autenticación del sistema:
+ * - Registro de nuevos usuarios
+ * - Inicio de sesión
+ * - Encriptación de contraseñas
+ * - Generación de tokens JWT
+ */
 @Injectable()
 export class AuthService {
 
@@ -15,6 +23,12 @@ export class AuthService {
     
     ) { } 
 
+    /**
+     * Registra un nuevo usuario en el sistema
+     * @param registerDto - Datos de registro del usuario
+     * @throws BadRequestException - Si el usuario ya existe
+     * @returns Usuario creado
+     */
     async register(registerDto:RegisterDto) { // Método para registrar un nuevo usuario
         const user= await this.usersService.findOneByRut(registerDto.rut); // Buscar el usuario por email
         if(user) { // Si el usuario ya existe
@@ -27,6 +41,12 @@ export class AuthService {
           };
         return await this.usersService.create(newUser); // Llama al servicio de usuarios para crear un nuevo usuario
     }
+    /**
+     * Autentica un usuario y genera un token JWT
+     * @param loginDto - Credenciales de inicio de sesión
+     * @throws UnauthorizedException - Si las credenciales son inválidas
+     * @returns Token JWT y datos del usuario
+     */
     async login(loginDto:LoginDto){ // Método para iniciar sesión
         const user= await this.usersService.findOneByRut(loginDto.rut);
         if(!user) {
