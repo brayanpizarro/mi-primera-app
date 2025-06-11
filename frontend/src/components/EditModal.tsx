@@ -10,51 +10,46 @@ interface Props {
 }
 
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload';
-const UPLOAD_PRESET = 'InventarioECIN';
+const UPLOAD_PRESET  = 'InventarioECIN';
 
 const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
+  /* ---------- bloqueo de scroll del fondo ---------- */
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';   // 🔒
+    return () => { document.body.style.overflow = ''; }; // 🔓 al desmontar
+  }, []);
+
   const [uploading, setUploading] = useState(false);
   const [localImage, setLocalImage] = useState<string>(item.imageUrl || '');
-  const [localFile, setLocalFile] = useState<File | null>(null);
+  const [localFile,  setLocalFile]  = useState<File | null>(null);
   const [show, setShow] = useState(false);
 
-  // Ubicaciones
+  /* ---- ubicaciones / estados / attrs (igual que antes) ---- */
   const [locations, setLocations] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem('locations') || '[]')
   );
-  const [newLocation, setNewLocation] = useState('');
+  const [newLocation,          setNewLocation]          = useState('');
   const [showNewLocationInput, setShowNewLocationInput] = useState(false);
-  const [showDeleteSelect, setShowDeleteSelect] = useState(false);
+  const [showDeleteSelect,     setShowDeleteSelect]     = useState(false);
 
-  // Estados
   const [statuses, setStatuses] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem('statuses') || '[]')
   );
-  const [newStatus, setNewStatus] = useState('');
-  const [showNewStatusInput, setShowNewStatusInput] = useState(false);
-  const [showDeleteStatus, setShowDeleteStatus] = useState(false);
-  // Atributos personalizados
+  const [newStatus,           setNewStatus]           = useState('');
+  const [showNewStatusInput,  setShowNewStatusInput]  = useState(false);
+  const [showDeleteStatus,    setShowDeleteStatus]    = useState(false);
+
   const [attrs, setAttrs] = useState<{ key: string; value: string }[]>([]);
 
   useEffect(() => {
     setShow(true);
-    // Convertir customAttributes a array editable
     const ca = item.customAttributes || {};
     setAttrs(Object.entries(ca).map(([key, value]) => ({ key, value })));
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('locations', JSON.stringify(locations));
-  }, [locations]);
-
-  useEffect(() => {
-    if (!localFile) setLocalImage(item.imageUrl || '');
-  }, [item.imageUrl, localFile]);
-
-  useEffect(() => {
-    localStorage.setItem('statuses', JSON.stringify(statuses));
-  }, [statuses]);
-
+  useEffect(() => localStorage.setItem('locations', JSON.stringify(locations)), [locations]);
+  useEffect(() => localStorage.setItem('statuses', JSON.stringify(statuses)), [statuses]);
+  useEffect(() => { if (!localFile) setLocalImage(item.imageUrl || ''); }, [item.imageUrl, localFile]);
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;

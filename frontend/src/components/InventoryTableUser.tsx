@@ -58,7 +58,7 @@ const InventoryTableUser: React.FC<Props> = ({ items }) => {
       {/* Modal para imagen ampliada */}
       {modalImage && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="inventory-modal-content" onClick={e => e.stopPropagation()}>
             <img src={modalImage} alt="Imagen grande" />
             <button className="modal-close-button" onClick={closeModal}>
               ×

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import './Login.css';
 import axios from 'axios';
-
+import ucnLogo from '../assets/ucnLogo-b0e5fe78.png';
+import eicLogo from '../assets/eicLogo-586fa087.png';
 const Login = () => {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
@@ -73,6 +74,11 @@ const Login = () => {
 
   return (
     <div className="login-wrapper">
+      <div className="logos-container">
+        <img src={ucnLogo} alt="Universidad Católica del Norte" className="institution-logo" />
+        <img src={eicLogo} alt="Escuela de Ingeniería y Ciencias" className="institution-logo" />
+      </div>
+
       <div className="login-container">
         <div className="login-header">
           <h2 className="app-title">StockMind</h2>
@@ -116,15 +122,7 @@ const Login = () => {
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
 
-          <div className="register-redirect">
-            ¿No tienes una cuenta?{' '}
-            <span 
-              className="register-link" 
-              onClick={() => navigate('/register')}
-            >
-              Regístrate aquí
-            </span>
-          </div>
+         
         </form>
       </div>
     </div>

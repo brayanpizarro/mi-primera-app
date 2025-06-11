@@ -1,26 +1,32 @@
-// AddModal.tsx
+// src/components/AddModal.tsx
 import React, { useEffect, useState } from 'react';
 import './AddModal.css';
 import { InventoryItem } from '../types/InventoryItem';
 
 interface Props {
-  onAdd: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
+  onAdd:   (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
 }
 
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload';
-const UPLOAD_PRESET   = 'InventarioECIN';
+const UPLOAD_PRESET = 'InventarioECIN';
 
 const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
+  /* ---------- bloqueo de scroll del fondo ---------- */
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';   // 🔒
+    return () => { document.body.style.overflow = ''; }; // 🔓 al desmontar
+  }, []);
+
   /* ---------------- estado principal ---------------- */
   const [name,        setName]        = useState('');
   const [description, setDescription] = useState('');
   const [location,    setLocation]    = useState('');
   const [price,       setPrice]       = useState<number | ''>('');
   const [quantity,    setQuantity]    = useState<number | ''>('');
-  const [status,      setStatus]       = useState('');
+  const [status,      setStatus]      = useState('');
   const [image,       setImage]       = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState('');
+  const [imagePreview,setImagePreview] = useState('');
   const [uploading,   setUploading]   = useState(false);
   const [show,        setShow]        = useState(false);
 
@@ -28,22 +34,24 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
   const [locations,   setLocations]   = useState<string[]>(() =>
     JSON.parse(localStorage.getItem('locations') || '[]')
   );
-  const [newLocation,           setNewLocation]           = useState('');
-  const [showNewLocationInput,  setShowNewLocationInput]  = useState(false);
-  const [showDeleteSelect,      setShowDeleteSelect]      = useState(false);
+  const [newLocation,          setNewLocation]          = useState('');
+  const [showNewLocationInput, setShowNewLocationInput] = useState(false);
+  const [showDeleteSelect,     setShowDeleteSelect]     = useState(false);
 
   /* ---------------- estados ---------------- */
-  const [statuses,             setStatuses]             = useState<string[]>(() =>
+  const [statuses,             setStatuses]            = useState<string[]>(() =>
     JSON.parse(localStorage.getItem('statuses') || '[]')
   );
-  const [newStatus,           setNewStatus]             = useState('');
-  const [showNewStatusInput,  setShowNewStatusInput]    = useState(false);
-  const [showDeleteStatus,    setShowDeleteStatus]      = useState(false);
+  const [newStatus,           setNewStatus]            = useState('');
+  const [showNewStatusInput,  setShowNewStatusInput]   = useState(false);
+  const [showDeleteStatus,    setShowDeleteStatus]     = useState(false);
 
   /* ---------------- atributos extra ---------------- */
   const [attrs, setAttrs] = useState<{ key: string; value: string }[]>([]);
-  const addAttrField      = () => setAttrs(prev => [...prev, { key: '', value: '' }]);
-  const rmAttrField       = (i: number) => setAttrs(prev => prev.filter((_, idx) => idx !== i));
+  const addAttrField      = () =>
+    setAttrs(prev => [...prev, { key: '', value: '' }]);
+  const rmAttrField       = (i: number) =>
+    setAttrs(prev => prev.filter((_, idx) => idx !== i));
 
   /* ---------------- efectos ---------------- */
   useEffect(() => setShow(true), []);
@@ -54,7 +62,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
   const handleAddLocation = () => {
     const trimmed = newLocation.trim();
     if (!trimmed) return;
-    if (locations.includes(trimmed)) { alert('La ubicación ya existe.'); return; }
+    if (locations.includes(trimmed)) return alert('La ubicación ya existe.');
     setLocations(prev => [...prev, trimmed]);
     setLocation(trimmed);
     setNewLocation('');
@@ -71,7 +79,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
   const handleAddStatus = () => {
     const trimmed = newStatus.trim();
     if (!trimmed) return;
-    if (statuses.includes(trimmed)) { alert('El estado ya existe.'); return; }
+    if (statuses.includes(trimmed)) return alert('El estado ya existe.');
     setStatuses(prev => [...prev, trimmed]);
     setStatus(trimmed);
     setNewStatus('');
@@ -120,23 +128,23 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
       quantity:    Number(quantity),
       status:      status.trim(),
       imageUrl,
-      customAttributes: Object.keys(customAttributes).length ? customAttributes : undefined,
+      customAttributes: Object.keys(customAttributes).length
+        ? customAttributes
+        : undefined,
     });
 
     /* limpiar */
     setName(''); setDescription(''); setLocation('');
     setPrice(''); setQuantity(''); setImage(null);
-    setStatus('');setImagePreview(''); setAttrs([]);
+    setStatus(''); setImagePreview(''); setAttrs([]);
   };
 
   const handleClose = () => {
     setShow(false);
-    setTimeout(onCancel, 300);
+    setTimeout(onCancel, 300); // coincide con la animación CSS
   };
-
- 
   return (
-    <div className={`modal-backdrop ${show ? 'show' : 'hide'}`}>
+    <div className={`modal-backdrop  ${show ? 'show' : 'hide'}`}>
       <div className={`modal-content ${show ? 'show' : 'hide'}`}>
         <h2>Agregar nuevo producto</h2>
 
