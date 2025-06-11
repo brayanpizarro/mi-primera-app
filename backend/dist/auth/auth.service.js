@@ -36,17 +36,26 @@ let AuthService = class AuthService {
     async login(loginDto) {
         const user = await this.usersService.findOneByRut(loginDto.rut);
         if (!user) {
-            throw new common_1.UnauthorizedException('email not found');
+            throw new common_1.UnauthorizedException('RUT no encontrado');
         }
         const isPassword = await bcryptjs.compare(loginDto.password, user.password);
         if (!isPassword) {
-            throw new common_1.UnauthorizedException('password not found');
+            throw new common_1.UnauthorizedException('Contraseña incorrecta');
         }
-        const payload = { email: user.email };
+        const payload = {
+            email: user.email,
+            rut: user.rut,
+            role: user.role
+        };
         const token = this.jwtService.sign(payload);
         return {
             token,
-            user,
+            user: {
+                name: user.name,
+                email: user.email,
+                rut: user.rut,
+                role: user.role
+            }
         };
     }
 };

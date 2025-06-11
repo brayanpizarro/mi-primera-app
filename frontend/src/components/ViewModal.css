@@ -1,0 +1,42 @@
+/* src/components/ViewModal.css */
+.view-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.view-modal-content {
+  position: relative;
+  background: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.view-image {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  
+}
+
+.view-close-btn {
+  position: absolute;
+  top: .5rem;
+  right: .8rem;
+  font-size: 1.8rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+h2{
+    text-align: center;
+}

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -36,11 +37,32 @@ export class UsersService {
   findOneByEmail(email: string) { //buscar un usuario por email
     //el email es unico por lo que no se puede repetir
     return  this.userRepository.findOneBy({email}); //buscar el usuario por email en la base de datos
-  }
+  }    async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
 
-    async update(id: number, updateUserDto: UpdateUserDto) {//actualizar un usuario por id
-    //el id es unico por lo que no se puede repetir
-    return await this.userRepository.update(id, updateUserDto); //actualizar el usuario en la base de datos (se le pasa el id y el dto)
+    // Si se proporciona una contraseña actual y nueva, validar y actualizar
+    if (updateUserDto.currentPassword && updateUserDto.newPassword) {
+      const isPasswordValid = await bcrypt.compare(updateUserDto.currentPassword, user.password);
+      if (!isPasswordValid) {
+        throw new Error('Contraseña actual incorrecta');
+      }
+      const hashedPassword = await bcrypt.hash(updateUserDto.newPassword, 10);
+      user.password = hashedPassword;
+    }
+
+    // Actualizar otros campos si se proporcionan
+    if (updateUserDto.name) {
+      user.name = updateUserDto.name;
+    }
+
+    if (updateUserDto.role) {
+      user.role = updateUserDto.role;
+    }
+
+    return await this.userRepository.save(user);
   }
 
   async remove(id: number) {//eliminar un usuario por id

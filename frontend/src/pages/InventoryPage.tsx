@@ -10,6 +10,7 @@ import {
 import EditModal from '../components/EditModal';
 import AddModal from '../components/AddModal';
 import './InventoryPage.css';
+import ViewModal from '../components/ViewModal';
 
 const InventoryPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -22,6 +23,7 @@ const InventoryPage = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedLocation, setSelectedLocation] = useState('');
   const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
+  const [viewingItem, setViewingItem] = useState<InventoryItem | null>(null);
 
   useEffect(() => {
     getInventory()
@@ -88,64 +90,47 @@ const handleSaveEdit = async () => {
   }
 };
 
+const onView = (id: number) => {
+  const item = items.find(i => i.id === id);
+  if (item) setViewingItem(item);
+};
+
   // Delete handler con confirmación de cantidad si es > 1
-  const onDelete = async (id: number) => {
+const onDelete = async (id: number, amount: number) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    if (item.quantity > 1) {
-      const cantidad = prompt(`Este producto tiene ${item.quantity} unidades. ¿Cuántas quieres eliminar?`);
-      if (cantidad === null) return; // canceló
+    let cantidadNum: number;
 
-      const cantidadNum = Number(cantidad);
-      if (isNaN(cantidadNum) || cantidadNum <= 0 || cantidadNum > item.quantity) {
-        alert('Cantidad inválida.');
-        return;
-      }
+    cantidadNum = amount;
+    
 
+    if (isNaN(cantidadNum) || cantidadNum <= 0 || cantidadNum > item.quantity) {
+      alert('Cantidad inválida.');
+      return;
+    }
+
+    /* ---------- igual que antes ---------- */
+    try {
       if (cantidadNum === item.quantity) {
-        // Eliminar todo el ítem
-        try {
-          await deleteInventoryItem(id);
-          setItems(prev => prev.filter(p => p.id !== id));
-          setMessage(`"${item.name}" eliminado completamente`);
-          setTimeout(() => setMessage(''), 3000);
-        } catch (err) {
-          console.error('Error al eliminar:', err);
-          alert('No se pudo eliminar el producto.');
-        }
-      } else {
-        // Actualizar cantidad
-        try {
-          const nuevaCantidad = item.quantity - cantidadNum;
-          await updateInventoryItem(id, { quantity: nuevaCantidad });
-          setItems(prev =>
-            prev.map(p =>
-              p.id === id ? { ...p, quantity: nuevaCantidad } : p
-            )
-          );
-          setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad}`);
-          setTimeout(() => setMessage(''), 3000);
-        } catch (err) {
-          console.error('Error al actualizar cantidad:', err);
-          alert('No se pudo actualizar la cantidad.');
-        }
-      }
-    } else {
-      // Solo una unidad, eliminar directamente
-      if (!window.confirm(`¿Seguro que quieres eliminar "${item.name}"?`)) return;
-
-      try {
         await deleteInventoryItem(id);
         setItems(prev => prev.filter(p => p.id !== id));
-        setMessage(`"${item.name}" eliminado correctamente`);
-        setTimeout(() => setMessage(''), 3000);
-      } catch (err) {
-        console.error('Error al eliminar:', err);
-        alert('No se pudo eliminar el producto.');
+        setMessage(`"${item.name}" eliminado completamente`);
+      } else {
+        const nuevaCantidad = item.quantity - cantidadNum;
+        await updateInventoryItem(id, { quantity: nuevaCantidad });
+        setItems(prev => prev.map(p =>
+          p.id === id ? { ...p, quantity: nuevaCantidad } : p
+        ));
+        setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad}`);
       }
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error('Error al eliminar/actualizar:', err);
+      alert('No se pudo completar la operación.');
     }
   };
+
 
   // Filtro y búsqueda
     const filteredItems = items
@@ -221,7 +206,7 @@ const handleSaveEdit = async () => {
 
       {loading ? <p>Cargando...</p> : (
         <>
-          <InventoryTable items={filteredItems} onEdit={onEdit} onDelete={onDelete} />
+          <InventoryTable items={filteredItems} onEdit={onEdit} onDelete={onDelete} onView={onView} />
 
           {/* Modal para editar */}
           {editingItem && (
@@ -250,6 +235,9 @@ const handleSaveEdit = async () => {
               }}
               onCancel={() => setAddingItem(false)}
             />
+          )}
+          {viewingItem && (
+            <ViewModal item={viewingItem} onClose={() => setViewingItem(null)} />
           )}
         </>
       )}

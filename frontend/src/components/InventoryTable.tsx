@@ -1,78 +1,151 @@
+// src/components/InventoryTable.tsx
 import React, { useState } from 'react';
-import { InventoryItem } from '../types/InventoryItem';
-import './InventoryTable.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png'
+import { InventoryItem } from '../types/InventoryItem';
+import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png';
+import './InventoryTable.css';
 
 interface Props {
-  items: InventoryItem[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  items:     InventoryItem[];
+  onEdit:   (id: number)            => void;
+  onDelete: (id: number, qty: number) => void;
+  onView:   (id: number)            => void;   // 👈 ¡IMPORTANTE!
 }
 
-const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete }) => {
+const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) => {
   const [modalImage, setModalImage] = useState<string | null>(null);
 
-  const openModal = (imageUrl: string) => {
-    setModalImage(imageUrl);
-  };
-
-  const closeModal = () => {
-    setModalImage(null);
-  };
+  // fila que está en “modo eliminar”
+  const [deleteRow, setDeleteRow] = useState<number>(-1);
+  const [deleteQty, setDeleteQty] = useState<number>(1);
 
   return (
     <>
-      <table className="centered-table">
+      <table className="inventory-table">
         <thead>
           <tr>
-            <th></th>
+            <th />
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Ubicación</th>
             <th>Precio</th>
             <th>Cantidad</th>
+            <th>Estado</th>
             <th>Fecha de ingreso</th>
-            <th>Modificar</th>
+            <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {items.map(item => (
-            <tr key={item.id}>
+            <tr
+              key={item.id}
+              className="clickable-row"
+              onClick={() => onView(item.id)}           // 👈 abre el modal
+            >
+              {/* ───── IMAGEN ───── */}
               <td>
                 <img
                   src={item.imageUrl || imagenPredeterminada}
                   alt={item.name}
-                  className="inventory-image"
-                  onClick={() => openModal(item.imageUrl || imagenPredeterminada)}
-                  style={{ cursor: 'pointer' }}
+                  className="inventory-item-image"
+                  onClick={e => {                       // evita que abra dos modales
+                    e.stopPropagation();
+                    setModalImage(item.imageUrl || imagenPredeterminada);
+                  }}
                 />
               </td>
+
+              {/* ───── DATOS BÁSICOS ───── */}
               <td>{item.name}</td>
               <td>{item.description || '-'}</td>
               <td>{item.location}</td>
               <td>${item.price.toLocaleString('es-CL')}</td>
               <td>{item.quantity}</td>
+              <td>{item.status}</td>
               <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
-              <td>
-                <button onClick={() => onEdit(item.id)} className="icon-button">
-                  <FaEdit />
-                </button>
-                <button onClick={() => onDelete(item.id)} className="icon-button">
-                  <FaTrash />
-                </button>
+
+              {/* ───── ACCIONES ───── */}
+              <td
+                className="inventory-action-cell"
+                onClick={e => e.stopPropagation()}      // 🔇 no propagar al <tr>
+              >
+                {deleteRow !== item.id ? (
+                  <>
+                    <button
+                      className="inventory-icon-button"
+                      onClick={() => onEdit(item.id)}
+                    >
+                      <FaEdit />
+                    </button>
+
+                    <button
+                      className="inventory-icon-button"
+                      onClick={() => {
+                        setDeleteRow(item.id);
+                        setDeleteQty(1);
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </>
+                ) : (
+                  <div className="inventory-delete-mode">
+                    <input
+                      type="number"
+                      min={1}
+                      max={item.quantity}
+                      step={1}
+                      value={deleteQty}
+                      className="inventory-qty-input"
+                      onChange={e => {
+                        const v = Number(e.target.value);
+                        if (!Number.isNaN(v))
+                          setDeleteQty(Math.max(1, Math.min(item.quantity, v)));
+                      }}
+                    />
+
+                    {/* Botones debajo del input */}
+                    <div className="inventory-delete-buttons">
+                      <button
+                        className="inventory-confirm-btn"
+                        onClick={() => {
+                          onDelete(item.id, deleteQty);
+                          setDeleteRow(-1);
+                        }}
+                      >
+                        Eliminar
+                      </button>
+                      <button
+                        className="inventory-cancel-btn"
+                        onClick={() => setDeleteRow(-1)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Modal */}
+      {/* ───── Modal sólo para ver la imagen ───── */}
       {modalImage && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <img src={modalImage} alt="Imagen grande" />
-            <button className="modal-close-button" onClick={closeModal}>
+        <div
+          className="inventory-modal-overlay"
+          onClick={() => setModalImage(null)}
+        >
+          <div
+            className="inventory-modal-content"
+            onClick={e => e.stopPropagation()}
+          >
+            <img src={modalImage} alt="Vista previa" />
+            <button
+              className="inventory-modal-close-button"
+              onClick={() => setModalImage(null)}
+            >
               ×
             </button>
           </div>

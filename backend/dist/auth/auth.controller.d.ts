@@ -8,7 +8,12 @@ export declare class AuthController {
     register(registerDto: RegisterDto): Promise<import("../users/dto/create-user.dto").CreateUserDto & import("../users/entities/user.entity").User>;
     login(loginDto: LoginDto): Promise<{
         token: string;
-        user: import("../users/entities/user.entity").User;
+        user: {
+            name: string;
+            email: string;
+            rut: string;
+            role: import("../users/entities/user-role.enum").UserRole;
+        };
     }>;
     profile(req: Request): any;
 }

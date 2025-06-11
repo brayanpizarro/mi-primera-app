@@ -5,6 +5,8 @@ export interface InventoryItem {
   location: string;
   price: number;
   quantity: number;
+  status: string;
   createdAt: string; 
   imageUrl?: string;
+  customAttributes?: Record<string, string>;
 }

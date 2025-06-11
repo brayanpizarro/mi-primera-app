@@ -1,0 +1,127 @@
+/* src/components/InventoryTableUser.css - Versión adaptada a colores académicos */
+
+/* Estilos generales de la tabla */
+.centered-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Más suave */
+  border-radius: 8px; /* Menos redondeado */
+  overflow: hidden;
+  background-color: white; /* Fondo sólido */
+  border: 1px solid #e2e8f0; /* Borde gris azulado */
+  backdrop-filter: none; /* Eliminamos el efecto de vidrio */
+}
+
+/* Encabezado de la tabla - Azul oscuro como en la imagen */
+.centered-table thead tr {
+  background: linear-gradient(to right, #1a365d, #2b6cb0); /* Degradado oscuro a medio */
+  color: white;
+  text-align: left;
+}
+
+.centered-table th {
+  padding: 1rem 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Celdas de la tabla */
+.centered-table td {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid #edf2f7; /* Borde más claro */
+  color: #2d3748; /* Texto más oscuro */
+}
+
+.centered-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Efecto hover para filas - Azul muy claro */
+.centered-table tbody tr:hover {
+  background-color: #fff4eb; /* Reemplaza el rgba por sólido */
+}
+
+/* Imágenes del inventario (se mantienen igual) */
+.inventory-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.inventory-image:hover {
+  transform: scale(1.05);
+}
+
+/* Modal - Se mantiene igual excepto el botón */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: transparent;
+}
+
+.modal-content img {
+  max-height: 80vh;
+  max-width: 90vw;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Botón del modal con nuevo color */
+.modal-close-button {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background: linear-gradient(to right, #2b6cb0, #3182ce); /* Azul académico */
+  color: white;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-button:hover {
+  background: linear-gradient(to right, #1a365d, #2b6cb0); /* Oscuro al hover */
+}
+
+/* Responsive (se mantiene igual) */
+@media (max-width: 768px) {
+  .centered-table {
+    font-size: 0.85rem;
+  }
+  
+  .centered-table th,
+  .centered-table td {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .inventory-image {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Eliminamos los efectos de vidrio para móviles (ya no aplican) */
