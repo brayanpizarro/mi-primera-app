@@ -22,10 +22,12 @@ export class AuthController {
      */
     @Post('register')
     register(
-        @Body()
-        registerDto: RegisterDto,
-    ) {
-        return this.authService.register(registerDto);
+        @Body() // Decorador para obtener el cuerpo de la solicitud
+        registerDto:RegisterDto,
+    ){
+        return this.authService.register(registerDto); // Llama al servicio de autenticación para registrar un nuevo usuario
+
+
     }
 
     /**

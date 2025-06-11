@@ -1,7 +1,93 @@
-// src/pages/RegisterUser.tsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
+import axios from 'axios';
 
 const RegisterUser = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    rut: '',
+    email: '',
+    password: '',
+    role: 'user' // Valor por defecto según el enum UserRole (ahora en minúscula)
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const formatRut = (rut: string) => {
+    // Eliminar puntos y guión existentes
+    let cleanRut = rut.replace(/\./g, '').replace(/-/g, '');
+    
+    // Formatear con puntos y guión
+    if (cleanRut.length > 1) {
+      cleanRut = cleanRut.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + cleanRut.slice(-1);
+    }
+    
+    return cleanRut.toUpperCase();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    // Permitir solo números, k, K y guión
+    value = value.replace(/[^0-9kK-]/g, '');
+    setFormData(prev => ({
+      ...prev,
+      rut: value
+    }));
+  };
+
+  const handleRoleChange = (role: 'user' | 'admin') => {
+    setFormData(prev => ({
+      ...prev,
+      role
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Formatear el RUT antes de enviarlo
+      const formattedRut = formatRut(formData.rut);
+      
+      // Enviar datos al backend con el prefijo /api/v1
+      await axios.post('http://localhost:3000/api/v1/auth/register', {
+        ...formData,
+        rut: formattedRut
+      });
+
+      // Redirigir al login después de registro exitoso
+      navigate('/login', {
+        state: { registrationSuccess: true }
+      });
+    } catch (err: any) {
+      // Manejo mejorado de errores
+      if (err.response) {
+        if (err.response.status === 400) {
+          setError('El usuario ya existe');
+        } else {
+          setError(err.response.data?.message || 'Error en el registro');
+        }
+      } else {
+        setError('Error de conexión con el servidor');
+      }
+      console.error('Error en el registro:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="register-wrapper">
       <div className="register-container">
@@ -10,7 +96,9 @@ const RegisterUser = () => {
           <p className="app-subtitle">StockMind - Gestión de Inventarios UCN</p>
         </div>
         
-        <form className="register-form">
+        {error && <div className="error-message">{error}</div>}
+        
+        <form className="register-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Nombre Completo</label>
             <input 
@@ -18,6 +106,10 @@ const RegisterUser = () => {
               className="form-input"
               placeholder="Ej: Pablo Perez"
               required
+              name="name"
+              minLength={1}
+              value={formData.name}
+              onChange={handleChange}
             />
           </div>
           
@@ -26,9 +118,12 @@ const RegisterUser = () => {
             <input 
               type="text" 
               className="form-input"
-              placeholder="12345678-9"
+              placeholder="12.345.678-9"
               required
-              pattern="\d{7,8}-[\dKk]"
+              name="rut"
+              value={formData.rut}
+              onChange={handleRutChange}
+              maxLength={12}
             />
           </div>
           
@@ -39,7 +134,9 @@ const RegisterUser = () => {
               className="form-input"
               placeholder="usuario@alumnos.ucn.cl"
               required
-              pattern=".+@(alumnos|ucn)\.cl"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
           
@@ -48,15 +145,52 @@ const RegisterUser = () => {
             <input 
               type="password" 
               className="form-input"
-              placeholder="Mínimo 8 caracteres"
+              placeholder="Mínimo 6 caracteres"
               required
-              minLength={8}
+              minLength={6}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
+
+          <div className="form-group">
+            <label className="form-label">Tipo de Usuario</label>
+            <div className="role-buttons-container">
+              <button
+                type="button"
+                className={`role-button ${formData.role === 'user' ? 'active' : ''}`}
+                onClick={() => handleRoleChange('user')}
+              >
+                Usuario Normal
+              </button>
+              <button
+                type="button"
+                className={`role-button ${formData.role === 'admin' ? 'active' : ''}`}
+                onClick={() => handleRoleChange('admin')}
+              >
+                Administrador
+              </button>
+            </div>
+          </div>
           
-          <button type="submit" className="submit-button">
-            Registrarse
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Registrando...' : 'Registrarse'}
           </button>
+
+          <div className="login-redirect">
+            ¿Ya tienes una cuenta?{' '}
+            <span 
+              className="login-link" 
+              onClick={() => navigate('/login')}
+            >
+              Inicia sesión aquí
+            </span>
+          </div>
         </form>
       </div>
     </div>

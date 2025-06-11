@@ -49,20 +49,30 @@ export class AuthService {
      */
     async login(loginDto:LoginDto){ // Método para iniciar sesión
         const user= await this.usersService.findOneByRut(loginDto.rut);
-        if(!user) { // Si el usuario no existe
-            throw new UnauthorizedException('email not found'); // Lanzar un error
+        if(!user) {
+            throw new UnauthorizedException('RUT no encontrado');
         }
-        const isPassword = await bcryptjs.compare(loginDto.password, user.password); // Comparar la contraseña
-        if(!isPassword) { // Si la contraseña no coincide
-            throw new UnauthorizedException('password not found'); // Lanzar un error
+        const isPassword = await bcryptjs.compare(loginDto.password, user.password);
+        if(!isPassword) {
+            throw new UnauthorizedException('Contraseña incorrecta');
         }
-        const payload = {email:user.email}; // Email del usuario
 
-        const token = this.jwtService.sign(payload); // Firmar el token
+        const payload = {
+            email: user.email,
+            rut: user.rut,
+            role: user.role // Asegúrate de que tu entidad User tenga un campo role
+        };
+
+        const token = this.jwtService.sign(payload);
 
         return {
             token,
-            user ,
+            user: {
+                name: user.name,
+                email: user.email,
+                rut: user.rut,
+                role: user.role
+            }
         };
     }
 }
