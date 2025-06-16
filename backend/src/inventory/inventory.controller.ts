@@ -40,10 +40,21 @@ export class InventoryController {
    * @roles ADMIN, USER
    */
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  findAll(@Query('filter') filter?: string) {  //EJEMPLO DE BUSQUEDA POR FILTRO: http://localhost:3000/inventory?filter=Epson
-    return this.inventoryService.findAll(filter);
+    @Roles(UserRole.ADMIN, UserRole.USER)
+    findAll(
+      @Query('filter') filter?: string,
+      @Query('page') page = '1',
+      @Query('limit') limit = '10',
+      @Query('location') location?: string,
+      @Query('status') status?: string,
+      @Query('sort') sort = 'createdAt',
+      @Query('direction') direction: 'ASC' | 'DESC' = 'DESC',
+    ) {
+      const pageNum = parseInt(page, 10);
+      const limitNum = parseInt(limit, 10);
+      return this.inventoryService.findAllPaginated(filter, pageNum, limitNum, location, status, sort, direction);
   }
+
 
   /**
    * Obtiene un item específico por ID
@@ -51,11 +62,26 @@ export class InventoryController {
    * @returns Item encontrado
    * @roles ADMIN, USER
    */
+
+  @Get('locations')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getLocations() {
+    return this.inventoryService.getUniqueLocations();
+  }
+  
+  @Get('statuses')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getStatuses() {
+    return this.inventoryService.getUniqueStatuses();
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.USER)
   findOne(@Param('id') id: string) {
     return this.inventoryService.findOne(+id);
   }
+
+
 
   /**
    * Actualiza un item existente

@@ -124,4 +124,9 @@
   }
 }
 
-/* Eliminamos los efectos de vidrio para móviles (ya no aplican) */
+.custom-attr-icon-user {
+  color: #57cfff; 
+  font-size: 1.2em;
+  margin-left:40px;
+  user-select: none;
+}

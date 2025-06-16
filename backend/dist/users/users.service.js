@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
+const bcrypt = require("bcrypt");
 let UsersService = class UsersService {
     userRepository;
     constructor(userRepository) {
@@ -38,7 +39,25 @@ let UsersService = class UsersService {
         return this.userRepository.findOneBy({ email });
     }
     async update(id, updateUserDto) {
-        return await this.userRepository.update(id, updateUserDto);
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new Error('Usuario no encontrado');
+        }
+        if (updateUserDto.currentPassword && updateUserDto.newPassword) {
+            const isPasswordValid = await bcrypt.compare(updateUserDto.currentPassword, user.password);
+            if (!isPasswordValid) {
+                throw new Error('Contraseña actual incorrecta');
+            }
+            const hashedPassword = await bcrypt.hash(updateUserDto.newPassword, 10);
+            user.password = hashedPassword;
+        }
+        if (updateUserDto.name) {
+            user.name = updateUserDto.name;
+        }
+        if (updateUserDto.role) {
+            user.role = updateUserDto.role;
+        }
+        return await this.userRepository.save(user);
     }
     async remove(id) {
         return await this.userRepository.softDelete(id);

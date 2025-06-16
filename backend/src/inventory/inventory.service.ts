@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, FindOptionsWhere, ILike } from 'typeorm';
 import { Inventory } from './entities/inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
@@ -17,15 +17,44 @@ export class InventoryService {
     return this.inventoryRepo.save(newItem);
   }
 
-  findAll(filter?: string) {
-    if (filter) {
-      return this.inventoryRepo.find({
-        where: { name: Like(`%${filter}%`) },
-        order: { createdAt: 'DESC' },
-      });
-    }
-    return this.inventoryRepo.find({ order: { createdAt: 'DESC' } });
+  async findAllPaginated(
+  search: string | undefined,
+  page: number,
+  limit: number,
+  location?: string,
+  status?: string,
+  sort: string = 'createdAt',
+  direction: 'ASC' | 'DESC' = 'DESC',
+) {
+  const where: FindOptionsWhere<Inventory> = {};
+
+  if (search) {
+    where.name = ILike(`%${search}%`);
   }
+
+  if (location) {
+    where.location = location;
+  }
+
+  if (status) {
+    where.status = status;
+  }
+
+  const [data, total] = await this.inventoryRepo.findAndCount({
+    where,
+    order: { [sort]: direction },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+
+  return {
+    data,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
 
   findOne(id: number) {
     return this.inventoryRepo.findOneByOrFail({ id });
@@ -41,5 +70,24 @@ export class InventoryService {
     const item = await this.inventoryRepo.findOneBy({ id });
     if (!item) throw new NotFoundException(`Item #${id} not found`);
     return this.inventoryRepo.remove(item);
+  }
+
+  async getUniqueLocations(): Promise<string[]> {
+    const result = await this.inventoryRepo
+      .createQueryBuilder('inventory')
+      .select('DISTINCT inventory.location', 'location')
+      .where('inventory.location IS NOT NULL')
+      .getRawMany();
+
+    return result.map(row => row.location);
+  }
+  async getUniqueStatuses(): Promise<string[]> {
+      const result = await this.inventoryRepo
+        .createQueryBuilder('inventory')
+        .select('DISTINCT inventory.status', 'status')
+        .where('inventory.status IS NOT NULL')
+        .getRawMany();
+
+      return result.map(row => row.status);
   }
 }

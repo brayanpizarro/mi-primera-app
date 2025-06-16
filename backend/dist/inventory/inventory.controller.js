@@ -27,8 +27,16 @@ let InventoryController = class InventoryController {
     create(dto) {
         return this.inventoryService.create(dto);
     }
-    findAll(filter) {
-        return this.inventoryService.findAll(filter);
+    findAll(filter, page = '1', limit = '10', location, status, sort = 'createdAt', direction = 'DESC') {
+        const pageNum = parseInt(page, 10);
+        const limitNum = parseInt(limit, 10);
+        return this.inventoryService.findAllPaginated(filter, pageNum, limitNum, location, status, sort, direction);
+    }
+    async getLocations() {
+        return this.inventoryService.getUniqueLocations();
+    }
+    async getStatuses() {
+        return this.inventoryService.getUniqueStatuses();
     }
     findOne(id) {
         return this.inventoryService.findOne(+id);
@@ -52,10 +60,30 @@ __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
     __param(0, (0, common_1.Query)('filter')),
+    __param(1, (0, common_1.Query)('page')),
+    __param(2, (0, common_1.Query)('limit')),
+    __param(3, (0, common_1.Query)('location')),
+    __param(4, (0, common_1.Query)('status')),
+    __param(5, (0, common_1.Query)('sort')),
+    __param(6, (0, common_1.Query)('direction')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object, Object, String, String, Object, String]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('locations'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getLocations", null);
+__decorate([
+    (0, common_1.Get)('statuses'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getStatuses", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),

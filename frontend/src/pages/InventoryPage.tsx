@@ -2,115 +2,117 @@ import { useEffect, useState } from 'react';
 import InventoryTable from '../components/InventoryTable';
 import { InventoryItem } from '../types/InventoryItem';
 import {
+  getInventoryLocations,
   getInventory,
   updateInventoryItem,
   createInventoryItem,
-  deleteInventoryItem
+  deleteInventoryItem,
+  getInventoryStatuses
 } from '../services/inventoryService';
 import EditModal from '../components/EditModal';
 import AddModal from '../components/AddModal';
-import './InventoryPage.css';
 import ViewModal from '../components/ViewModal';
+import './InventoryPage.css';
+
+const itemsPerPage = 10;
 
 const InventoryPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [addingItem, setAddingItem] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<'price' | 'createdAt' | 'quantity'>('createdAt');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const locations = Array.from(new Set(items.map(item => item.location).filter(Boolean)));
   const [viewingItem, setViewingItem] = useState<InventoryItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [locations, setLocations] = useState<string[]>([]);
+  const [statuses, setStatuses] = useState<string[]>([]);
 
   useEffect(() => {
-    getInventory()
+    setLoading(true);
+    getInventory(
+      currentPage,
+      itemsPerPage,
+      searchQuery,
+      selectedLocation,
+      selectedStatus === '' ? undefined : selectedStatus,
+      sortField,
+      sortDirection.toUpperCase() as 'ASC' | 'DESC'
+    )
       .then(res => {
-        setItems(res.data);
+        setItems(res.data.data);
+        setTotalItems(res.data.total);
       })
       .catch(err => console.error('Error al cargar inventario:', err))
       .finally(() => setLoading(false));
+  }, [currentPage, searchQuery, sortField, sortDirection, selectedLocation, selectedStatus]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortField, sortDirection, selectedLocation]);
+
+
+  useEffect(() => {
+  getInventoryLocations()
+    .then(res => setLocations(res.data))
+    .catch(err => console.error('Error al cargar ubicaciones:', err));
   }, []);
 
-  // Edit handlers
+  useEffect(() => {
+    getInventoryStatuses()
+      .then((res) => {
+        setStatuses(res.data); 
+      })
+      .catch((err) => console.error('Error al cargar estados:', err));
+  }, []);
+
   const onEdit = (id: number) => {
     const item = items.find(i => i.id === id);
     if (item) setEditingItem(item);
   };
 
+  const handleEditChange = (field: keyof InventoryItem, value: string | number | File) => {
+    setEditingItem(prev => (prev ? { ...prev, [field]: value } : prev));
+  };
 
+  const handleSaveEdit = async () => {
+    if (!editingItem) return;
 
-const handleEditChange = (field: keyof InventoryItem, value: string | number | File) => {
-  
-  setEditingItem(prev =>
-    prev ? { ...prev, [field]: value } : prev
-  );
-};
+    const { id, createdAt, ...updateData } = editingItem;
 
-const handleImageChange = async (file: File) => {
-  try {
-   
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'InventarioECIN'); // ajusta aquí
-
-    const res = await fetch('https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.secure_url) {
-      handleEditChange('imageUrl', data.secure_url); // Actualiza la URL en el estado
+    try {
+      const res = await updateInventoryItem(id, updateData);
+      setItems(prev => prev.map(p => (p.id === id ? res.data : p)));
+      setEditingItem(null);
+      setMessage(`El objeto "${res.data.name}" ha sido actualizado correctamente`);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      console.error('Error al editar:', err);
+      alert('No se pudo actualizar el producto.');
     }
-  } catch (error) {
-    console.error('Error subiendo imagen:', error);
-    alert('No se pudo subir la imagen.');
-  }
-};
+  };
 
-const handleSaveEdit = async () => {
-  if (!editingItem) return;
+  const onView = (id: number) => {
+    const item = items.find(i => i.id === id);
+    if (item) setViewingItem(item);
+  };
 
-  const { id, createdAt, ...updateData } = editingItem;
-
-  try {
-    
-    const res = await updateInventoryItem(id, updateData);
-    setItems(prev =>
-      prev.map(p => (p.id === id ? res.data : p))
-    );
-    setEditingItem(null);
-    setMessage(`El objeto "${res.data.name}" ha sido actualizado correctamente`);
-    setTimeout(() => setMessage(''), 3000);
-  } catch (err) {
-    console.error('Error al editar:', err);
-    alert('No se pudo actualizar el producto.');
-  }
-};
-
-const onView = (id: number) => {
-  const item = items.find(i => i.id === id);
-  if (item) setViewingItem(item);
-};
-
-  // Delete handler con confirmación de cantidad si es > 1
-const onDelete = async (id: number, amount: number) => {
+  const onDelete = async (id: number, amount: number) => {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    let cantidadNum: number;
-
-    cantidadNum = amount;
-    
+    let cantidadNum: number = amount;
 
     if (isNaN(cantidadNum) || cantidadNum <= 0 || cantidadNum > item.quantity) {
       alert('Cantidad inválida.');
       return;
     }
 
-    /* ---------- igual que antes ---------- */
     try {
       if (cantidadNum === item.quantity) {
         await deleteInventoryItem(id);
@@ -131,29 +133,26 @@ const onDelete = async (id: number, amount: number) => {
     }
   };
 
+  const reloadInventory = () => {
+    setLoading(true);
+    return getInventory(
+      currentPage,
+      itemsPerPage,
+      searchQuery,
+      selectedLocation,
+      selectedStatus === '' ? undefined : selectedStatus,
+      sortField,
+      sortDirection.toUpperCase() as 'ASC' | 'DESC'
+    )
+      .then(res => {
+        setItems(res.data.data);
+        setTotalItems(res.data.total);
+      })
+      .catch(err => console.error('Error al recargar inventario:', err))
+      .finally(() => setLoading(false));
+  };
 
-  // Filtro y búsqueda
-    const filteredItems = items
-      .filter(item =>
-        (item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())))
-        &&
-        (selectedLocation === '' || item.location === selectedLocation)
-      )
-
-    .sort((a, b) => {
-      const factor = sortDirection === 'asc' ? 1 : -1;
-      switch (filter) {
-        case 'price':
-          return (a.price - b.price) * factor;
-        case 'quantity':
-          return (a.quantity - b.quantity) * factor;
-        case 'createdAt':
-          return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * factor;
-        default:
-          return 0;
-      }
-    });
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="inventory-container">
@@ -168,6 +167,7 @@ const onDelete = async (id: number, amount: number) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
         />
+
         <select
           value={selectedLocation}
           onChange={(e) => setSelectedLocation(e.target.value)}
@@ -180,14 +180,29 @@ const onDelete = async (id: number, amount: number) => {
         </select>
 
         <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="filter-select"
         >
-          <option value="">Ordenar por...</option>
-          <option value="price">Precio</option>
-          <option value="quantity">Cantidad</option>
-          <option value="createdAt">Fecha de ingreso</option>
+          <option value="">Todos los estados</option>
+          {statuses
+            .filter((status) => status.trim() !== '') 
+            .map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))
+          }
+        </select>
+
+        <select
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value as 'price' | 'createdAt' | 'quantity')}
+          className="filter-select"
+        >
+          <option value="createdAt">Ordenar por fecha</option>
+          <option value="price">Ordenar por precio</option>
+          <option value="quantity">Ordenar por cantidad</option>
         </select>
 
         <select
@@ -204,29 +219,60 @@ const onDelete = async (id: number, amount: number) => {
         </button>
       </div>
 
-      {loading ? <p>Cargando...</p> : (
+      {loading ? (
+        <p>Cargando...</p>
+      ) : (
         <>
-          <InventoryTable items={filteredItems} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+          <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
 
-          {/* Modal para editar */}
-          {editingItem && (
-            <EditModal
-              item={editingItem}
-              onChange={handleEditChange}
-              onSave={handleSaveEdit}
-              onCancel={() => setEditingItem(null)}
-            />
-          )}
+          <div className="pagination-controls">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              &laquo;
+            </button>
 
-          {/* Modal para agregar nuevo ítem usando AddModal */}
+            {(() => {
+              const maxVisiblePages = 5;
+              const half = Math.floor(maxVisiblePages / 2);
+              let startPage = Math.max(1, currentPage - half);
+              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+              }
+
+              const pages = [];
+              for (let i = startPage; i <= endPage; i++) {
+                pages.push(
+                  <button
+                    key={i}
+                    className={i === currentPage ? 'active-page' : ''}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              return pages;
+            })()}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              &raquo;
+            </button>
+          </div>
+
           {addingItem && (
             <AddModal
               onAdd={async (newItem) => {
                 try {
-                  const res = await createInventoryItem(newItem);
-                  setItems(prev => [...prev, res.data]);
+                  await createInventoryItem(newItem);
                   setAddingItem(false);
                   setMessage(`"${newItem.name}" agregado correctamente`);
+                  await reloadInventory();
                   setTimeout(() => setMessage(''), 3000);
                 } catch (err) {
                   console.error('Error al agregar:', err);
@@ -236,8 +282,21 @@ const onDelete = async (id: number, amount: number) => {
               onCancel={() => setAddingItem(false)}
             />
           )}
+
+          {editingItem && (
+            <EditModal
+              item={editingItem}
+              onChange={handleEditChange}
+              onSave={handleSaveEdit}
+              onCancel={() => setEditingItem(null)}
+            />
+          )}
+
           {viewingItem && (
-            <ViewModal item={viewingItem} onClose={() => setViewingItem(null)} />
+            <ViewModal
+              item={viewingItem}
+              onClose={() => setViewingItem(null)}
+            />
           )}
         </>
       )}

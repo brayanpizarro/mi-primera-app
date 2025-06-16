@@ -26,14 +26,29 @@ let InventoryService = class InventoryService {
         const newItem = this.inventoryRepo.create(dto);
         return this.inventoryRepo.save(newItem);
     }
-    findAll(filter) {
-        if (filter) {
-            return this.inventoryRepo.find({
-                where: { name: (0, typeorm_2.Like)(`%${filter}%`) },
-                order: { createdAt: 'DESC' },
-            });
+    async findAllPaginated(search, page, limit, location, status, sort = 'createdAt', direction = 'DESC') {
+        const where = {};
+        if (search) {
+            where.name = (0, typeorm_2.ILike)(`%${search}%`);
         }
-        return this.inventoryRepo.find({ order: { createdAt: 'DESC' } });
+        if (location) {
+            where.location = location;
+        }
+        if (status) {
+            where.status = status;
+        }
+        const [data, total] = await this.inventoryRepo.findAndCount({
+            where,
+            order: { [sort]: direction },
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+        return {
+            data,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        };
     }
     findOne(id) {
         return this.inventoryRepo.findOneByOrFail({ id });
@@ -49,6 +64,22 @@ let InventoryService = class InventoryService {
         if (!item)
             throw new common_1.NotFoundException(`Item #${id} not found`);
         return this.inventoryRepo.remove(item);
+    }
+    async getUniqueLocations() {
+        const result = await this.inventoryRepo
+            .createQueryBuilder('inventory')
+            .select('DISTINCT inventory.location', 'location')
+            .where('inventory.location IS NOT NULL')
+            .getRawMany();
+        return result.map(row => row.location);
+    }
+    async getUniqueStatuses() {
+        const result = await this.inventoryRepo
+            .createQueryBuilder('inventory')
+            .select('DISTINCT inventory.status', 'status')
+            .where('inventory.status IS NOT NULL')
+            .getRawMany();
+        return result.map(row => row.status);
     }
 };
 exports.InventoryService = InventoryService;
