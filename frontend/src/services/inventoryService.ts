@@ -3,8 +3,38 @@ import { InventoryItem } from '../types/InventoryItem';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const getInventory = () =>
-  axios.get<InventoryItem[]>(`${API_URL}/inventory`);
+export const getInventory = (
+  page = 1,
+  limit = 10,
+  search = '',
+  location = '',
+  status = '',
+  sort = 'createdAt',
+  direction: 'DESC' | 'ASC' = 'DESC'
+) => {
+  return axios.get<{ data: InventoryItem[]; total: number; page: number; totalPages: number }>(
+    `${API_URL}/inventory`,
+    {
+      params: {
+        page,
+        limit,
+        filter: search,        
+        location,              
+        status,                
+        sort,
+        direction,
+      },
+    }
+  );
+};
+
+export const getInventoryLocations = () => {
+  return axios.get<string[]>(`${API_URL}/inventory/locations`);
+};
+
+export const getInventoryStatuses = () => {
+  return axios.get<string[]>(`${API_URL}/inventory/statuses`);
+};
 
 export const deleteInventoryItem = (id: number) =>
   axios.delete(`${API_URL}/inventory/${id}`);

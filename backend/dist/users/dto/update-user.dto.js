@@ -14,9 +14,8 @@ const class_validator_1 = require("class-validator");
 const user_role_enum_1 = require("../entities/user-role.enum");
 class UpdateUserDto {
     name;
-    email;
-    rut;
-    password;
+    currentPassword;
+    newPassword;
     role;
 }
 exports.UpdateUserDto = UpdateUserDto;
@@ -28,21 +27,19 @@ __decorate([
 ], UpdateUserDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], UpdateUserDto.prototype, "email", void 0);
+], UpdateUserDto.prototype, "currentPassword", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], UpdateUserDto.prototype, "rut", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], UpdateUserDto.prototype, "password", void 0);
+], UpdateUserDto.prototype, "newPassword", void 0);
 __decorate([
     (0, class_validator_1.IsEnum)(user_role_enum_1.UserRole),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "role", void 0);
 //# sourceMappingURL=update-user.dto.js.map

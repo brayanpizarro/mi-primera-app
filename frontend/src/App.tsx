@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import InventoryPage from './pages/InventoryPage';
-import InventoryPageUser from './pages/InvetoryPageUser'
+import InventoryPageUser from './pages/InventoryPageUser'
 import Login from './pages/Login';
 import RegisterUser from './pages/RegisterUser';
 import ProtectedRoute from './components/ProtectedRoute';

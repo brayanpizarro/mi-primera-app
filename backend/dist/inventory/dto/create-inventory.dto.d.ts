@@ -4,7 +4,7 @@ export declare class CreateInventoryDto {
     location: string;
     price: number;
     quantity: number;
-    status: string;
+    status?: string;
     imageUrl?: string;
     customAttributes?: Record<string, any>;
 }

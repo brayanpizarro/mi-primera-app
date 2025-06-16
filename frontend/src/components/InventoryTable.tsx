@@ -9,13 +9,13 @@ interface Props {
   items:     InventoryItem[];
   onEdit:   (id: number)            => void;
   onDelete: (id: number, qty: number) => void;
-  onView:   (id: number)            => void;   // 👈 ¡IMPORTANTE!
+  onView:   (id: number)            => void;   
 }
 
 const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) => {
   const [modalImage, setModalImage] = useState<string | null>(null);
 
-  // fila que está en “modo eliminar”
+ 
   const [deleteRow, setDeleteRow] = useState<number>(-1);
   const [deleteQty, setDeleteQty] = useState<number>(1);
 
@@ -41,7 +41,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
             <tr
               key={item.id}
               className="clickable-row"
-              onClick={() => onView(item.id)}           // 👈 abre el modal
+              onClick={() => onView(item.id)}          
             >
               {/* ───── IMAGEN ───── */}
               <td>
@@ -49,7 +49,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
                   src={item.imageUrl || imagenPredeterminada}
                   alt={item.name}
                   className="inventory-item-image"
-                  onClick={e => {                       // evita que abra dos modales
+                  onClick={e => {                       
                     e.stopPropagation();
                     setModalImage(item.imageUrl || imagenPredeterminada);
                   }}
@@ -112,7 +112,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
                       }}
                     />
 
-                    {/* Botones debajo del input */}
+                    
                     <div className="inventory-delete-buttons">
                       <button
                         className="inventory-confirm-btn"

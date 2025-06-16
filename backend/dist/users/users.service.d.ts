@@ -10,6 +10,6 @@ export declare class UsersService {
     findOne(id: number): string;
     findOneByRut(rut: string): Promise<User | null>;
     findOneByEmail(email: string): Promise<User | null>;
-    update(id: number, updateUserDto: UpdateUserDto): Promise<import("typeorm").UpdateResult>;
+    update(id: number, updateUserDto: UpdateUserDto): Promise<User>;
     remove(id: number): Promise<import("typeorm").UpdateResult>;
 }
