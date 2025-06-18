@@ -43,13 +43,7 @@ let InventoryService = class InventoryService {
             .createQueryBuilder('inventory')
             .leftJoinAndSelect('inventory.attributes', 'attributes');
         if (search) {
-            const words = search.split(/\s+/).filter(Boolean);
-            queryBuilder.groupBy('inventory.id');
-            words.forEach((word, idx) => {
-                const param = `searchWord${idx}`;
-                queryBuilder.having(`SUM(CASE WHEN inventory.name ILIKE :${param} OR attributes.value ILIKE :${param} THEN 1 ELSE 0 END) > 0`);
-                queryBuilder.setParameter(param, `%${word}%`);
-            });
+            queryBuilder.where('(inventory.name ILIKE :search OR attributes.value ILIKE :search)', { search: `%${search}%` });
         }
         if (location) {
             queryBuilder.andWhere('inventory.location = :location', { location });
