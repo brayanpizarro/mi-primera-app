@@ -38,6 +38,15 @@ let InventoryController = class InventoryController {
     async getStatuses() {
         return this.inventoryService.getUniqueStatuses();
     }
+    async getAttributeKeys() {
+        return this.inventoryService.getUniqueAttributeKeys();
+    }
+    async findByAttribute(key, value) {
+        if (value) {
+            return this.inventoryService.findByAttribute(key, value);
+        }
+        return this.inventoryService.getUniqueAttributeValues(key);
+    }
     findOne(id) {
         return this.inventoryService.findOne(+id);
     }
@@ -84,6 +93,22 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "getStatuses", null);
+__decorate([
+    (0, common_1.Get)('attributes'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getAttributeKeys", null);
+__decorate([
+    (0, common_1.Get)('attributes/:key'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __param(0, (0, common_1.Param)('key')),
+    __param(1, (0, common_1.Query)('value')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findByAttribute", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './EditModal.css';
-import { InventoryItem } from '../types/InventoryItem';
+import { InventoryItem, InventoryAttribute } from '../types/InventoryItem';
 
 interface Props {
   item: InventoryItem;
@@ -39,17 +39,17 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
   const [showNewStatusInput,  setShowNewStatusInput]  = useState(false);
   const [showDeleteStatus,    setShowDeleteStatus]    = useState(false);
 
-  const [attrs, setAttrs] = useState<{ key: string; value: string }[]>([]);
+  const [attributes, setAttributes] = useState<{ key: string; value: string }[]>([]);
 
   useEffect(() => {
     setShow(true);
-    const ca = item.customAttributes || {};
-    setAttrs(Object.entries(ca).map(([key, value]) => ({ key, value })));
+    setAttributes(item.attributes.map(attr => ({ key: attr.key, value: attr.value })));
   }, []);
 
   useEffect(() => localStorage.setItem('locations', JSON.stringify(locations)), [locations]);
   useEffect(() => localStorage.setItem('statuses', JSON.stringify(statuses)), [statuses]);
   useEffect(() => { if (!localFile) setLocalImage(item.imageUrl || ''); }, [item.imageUrl, localFile]);
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -93,16 +93,22 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
     setShowNewLocationInput(false);
   };
 
-  const handleAttrChange = (index: number, field: 'key' | 'value', value: string) => {
-      const updated = [...attrs];
-      updated[index][field] = value;
-      setAttrs(updated);
-      const custom: Record<string, string> = {};
-      updated.forEach(({ key, value }) => {
-        if (key.trim()) custom[key.trim()] = value;
-      });
-      onChange('customAttributes', custom);
-    };
+  const handleAttributeChange = (index: number, field: 'key' | 'value', value: string) => {
+    const updated = [...attributes];
+    updated[index][field] = value;
+    setAttributes(updated);
+    
+    // Convertir a formato EAV
+    const validAttributes = updated
+      .filter(attr => attr.key.trim() && attr.value.trim())
+      .map(attr => ({
+        key: attr.key.trim(),
+        value: attr.value.trim()
+      }));
+    
+    onChange('attributes', validAttributes);
+  };
+
   const handleAddStatus = () => {
     const trimmed = newStatus.trim();
     if (!trimmed) return;
@@ -116,15 +122,21 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
     setShowNewStatusInput(false);
   };
 
-  const addAttrField = () => setAttrs(prev => [...prev, { key: '', value: '' }]);
-  const rmAttrField = (i: number) => {
-    const updated = attrs.filter((_, idx) => idx !== i);
-    setAttrs(updated);
-    const custom: Record<string, string> = {};
-    updated.forEach(({ key, value }) => {
-      if (key.trim()) custom[key.trim()] = value;
-    });
-    onChange('customAttributes', custom);
+  const addAttributeField = () => setAttributes(prev => [...prev, { key: '', value: '' }]);
+  
+  const removeAttributeField = (i: number) => {
+    const updated = attributes.filter((_, idx) => idx !== i);
+    setAttributes(updated);
+    
+    // Convertir a formato EAV
+    const validAttributes = updated
+      .filter(attr => attr.key.trim() && attr.value.trim())
+      .map(attr => ({
+        key: attr.key.trim(),
+        value: attr.value.trim()
+      }));
+    
+    onChange('attributes', validAttributes);
   };
 
   const handleClose = () => {
@@ -249,41 +261,60 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
             </div>
           )}
 
-
         <label>Imagen:
           <input type="file" accept="image/*" onChange={handleImageUpload} />
-          {uploading && <p>Subiendo imagen...</p>}
         </label>
-
         {localImage && (
           <div className="image-preview">
-            <img src={localImage} alt="Vista previa" />
+            <img src={localImage} alt="Preview" />
           </div>
         )}
 
-        <div className="custom-attributes">
-          <h4>Atributos personalizados</h4>
-          {attrs.map((attr, i) => (
-            <div key={i} className="attr-row-edit">
+        {/* ---- atributos extra ---- */}
+        <div className="attributes-section">
+          <h3>Atributos adicionales</h3>
+          {attributes.map((attr, i) => (
+            <div key={i} className="attribute-row">
               <input
-                placeholder="Atributo"
+                type="text"
+                placeholder="Clave"
                 value={attr.key}
-                onChange={e => handleAttrChange(i, 'key', e.target.value)}
+                onChange={e => handleAttributeChange(i, 'key', e.target.value)}
               />
               <input
+                type="text"
                 placeholder="Valor"
                 value={attr.value}
-                onChange={e => handleAttrChange(i, 'value', e.target.value)}
+                onChange={e => handleAttributeChange(i, 'value', e.target.value)}
               />
-              <button type="button"  className="small-btn dangerattr" onClick={() => rmAttrField(i)}>x</button>
+              <button
+                type="button"
+                className="small-btn danger"
+                onClick={() => removeAttributeField(i)}
+              >×</button>
             </div>
           ))}
-          <button type="button" className="small-btn" onClick={addAttrField}>+ Añadir atributo</button>
+          <button
+            type="button"
+            className="small-btn"
+            onClick={addAttributeField}
+          >+ Agregar atributo</button>
         </div>
 
-        <div className="modal-buttons">
-          <button onClick={onSave} disabled={uploading}>Guardar</button>
-          <button className="cancel" onClick={handleClose} disabled={uploading}>Cancelar</button>
+        {/* ---- botones de acción ---- */}
+        <div className="modal-actions">
+          <button
+            type="button"
+            className="btn cancel"
+            onClick={handleClose}
+            disabled={uploading}
+          >Cancelar</button>
+          <button
+            type="button"
+            className="btn save"
+            onClick={onSave}
+            disabled={uploading}
+          >{uploading ? 'Guardando...' : 'Guardar'}</button>
         </div>
       </div>
     </div>

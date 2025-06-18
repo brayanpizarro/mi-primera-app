@@ -36,12 +36,13 @@ const ViewModal: React.FC<Props> = ({ item, onClose }) => {
         <p><strong>Estado:</strong> {item.status || '—'}</p>
         <p><strong>Fecha de ingreso:</strong> {new Date(item.createdAt).toLocaleDateString()}</p>
 
-        {item.customAttributes && Object.keys(item.customAttributes).length > 0 && (
-          <>
-            {Object.entries(item.customAttributes).map(([k, v]) => (
-              <p key={k}><strong>{k}:</strong> {String(v)}</p>
+        {item.attributes && item.attributes.length > 0 && (
+          <div className="attributes-section">
+            <h3>Atributos adicionales</h3>
+            {item.attributes.map(attr => (
+              <p key={attr.id}><strong>{attr.key}:</strong> {attr.value}</p>
             ))}
-          </>
+          </div>
         )}
       </div>
     </div>

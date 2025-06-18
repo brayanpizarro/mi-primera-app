@@ -1,3 +1,4 @@
+import { InventoryAttributeDto } from './inventory-attribute.dto';
 export declare class CreateInventoryDto {
     name: string;
     description?: string;
@@ -6,5 +7,5 @@ export declare class CreateInventoryDto {
     quantity: number;
     status?: string;
     imageUrl?: string;
-    customAttributes?: Record<string, any>;
+    attributes?: InventoryAttributeDto[];
 }

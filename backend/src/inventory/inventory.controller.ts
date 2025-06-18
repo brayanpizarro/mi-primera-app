@@ -75,6 +75,24 @@ export class InventoryController {
     return this.inventoryService.getUniqueStatuses();
   }
 
+  @Get('attributes')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getAttributeKeys() {
+    return this.inventoryService.getUniqueAttributeKeys();
+  }
+
+  @Get('attributes/:key')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async findByAttribute(
+    @Param('key') key: string,
+    @Query('value') value: string,
+  ) {
+    if (value) {
+      return this.inventoryService.findByAttribute(key, value);
+    }
+    return this.inventoryService.getUniqueAttributeValues(key);
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.USER)
   findOne(@Param('id') id: string) {

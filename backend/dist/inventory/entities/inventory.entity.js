@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Inventory = void 0;
 const typeorm_1 = require("typeorm");
+const inventory_attribute_entity_1 = require("./inventory-attribute.entity");
 let Inventory = class Inventory {
     id;
     name;
@@ -19,8 +20,8 @@ let Inventory = class Inventory {
     price;
     quantity;
     status;
-    customAttributes;
     imageUrl;
+    attributes;
     createdAt;
 };
 exports.Inventory = Inventory;
@@ -53,13 +54,13 @@ __decorate([
     __metadata("design:type", String)
 ], Inventory.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)('json', { nullable: true }),
-    __metadata("design:type", Object)
-], Inventory.prototype, "customAttributes", void 0);
-__decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Inventory.prototype, "imageUrl", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => inventory_attribute_entity_1.InventoryAttribute, attr => attr.inventory),
+    __metadata("design:type", Array)
+], Inventory.prototype, "attributes", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

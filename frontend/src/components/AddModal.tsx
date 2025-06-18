@@ -1,10 +1,10 @@
 // src/components/AddModal.tsx
 import React, { useEffect, useState } from 'react';
 import './AddModal.css';
-import { InventoryItem } from '../types/InventoryItem';
+import { InventoryItem, InventoryAttribute } from '../types/InventoryItem';
 
 interface Props {
-  onAdd:   (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
+  onAdd: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
 }
 
@@ -47,11 +47,15 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
   const [showDeleteStatus,    setShowDeleteStatus]     = useState(false);
 
   /* ---------------- atributos extra ---------------- */
-  const [attrs, setAttrs] = useState<{ key: string; value: string }[]>([]);
-  const addAttrField      = () =>
-    setAttrs(prev => [...prev, { key: '', value: '' }]);
-  const rmAttrField       = (i: number) =>
-    setAttrs(prev => prev.filter((_, idx) => idx !== i));
+  const [attributes, setAttributes] = useState<{ key: string; value: string }[]>([]);
+  const addAttributeField = () =>
+    setAttributes(prev => [...prev, { key: '', value: '' }]);
+  const removeAttributeField = (i: number) =>
+    setAttributes(prev => prev.filter((_, idx) => idx !== i));
+  const updateAttribute = (index: number, field: 'key' | 'value', value: string) =>
+    setAttributes(prev => prev.map((attr, idx) => 
+      idx === index ? { ...attr, [field]: value } : attr
+    ));
 
   /* ---------------- efectos ---------------- */
   useEffect(() => setShow(true), []);
@@ -114,41 +118,41 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
     if (!validate()) return;
     const imageUrl = await uploadToCloudinary();
 
-    /* convertir attrs a objeto */
-    const customAttributes: Record<string,string> = {};
-    attrs.forEach(({ key, value }) => {
-      if (key.trim()) customAttributes[key.trim()] = value;
-    });
+    // Filtrar atributos vacíos y crear el array de atributos
+    const validAttributes = attributes
+      .filter(attr => attr.key.trim() && attr.value.trim())
+      .map(attr => ({
+        key: attr.key.trim(),
+        value: attr.value.trim()
+      }));
 
     onAdd({
-      name:        name.trim(),
+      name: name.trim(),
       description: description.trim(),
-      location:    location.trim(),
-      price:       Number(price),
-      quantity:    Number(quantity),
-      status:      status.trim(),
+      location: location.trim(),
+      price: Number(price),
+      quantity: Number(quantity),
+      status: status.trim(),
       imageUrl,
-      customAttributes: Object.keys(customAttributes).length
-        ? customAttributes
-        : undefined,
+      attributes: validAttributes
     });
 
     /* limpiar */
     setName(''); setDescription(''); setLocation('');
     setPrice(''); setQuantity(''); setImage(null);
-    setStatus(''); setImagePreview(''); setAttrs([]);
+    setStatus(''); setImagePreview(''); setAttributes([]);
   };
 
   const handleClose = () => {
     setShow(false);
     setTimeout(onCancel, 300); // coincide con la animación CSS
   };
+
   return (
     <div className={`modal-backdrop  ${show ? 'show' : 'hide'}`}>
       <div className={`modal-content ${show ? 'show' : 'hide'}`}>
         <h2>Agregar nuevo producto</h2>
 
-        
         <label>Nombre:
           <input value={name} onChange={e => setName(e.target.value)} />
         </label>
@@ -207,8 +211,6 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
           </div>
         )}
 
-
-       
         <label>Precio:
           <input type="number" min="0" value={price} onChange={e => setPrice(Number(e.target.value))} />
         </label>
@@ -267,42 +269,61 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
           </div>
         )}
 
-
-                {/* ---- atributos extra ---- */}
-        <label className="form-label" style={{ marginTop: '1rem' }}>Atributos extra:</label>
-        {attrs.map((attr, idx) => (
-          <div key={idx} className="attr-row">
-            <input
-              className="attr-input" placeholder="Atributo"
-              value={attr.key}
-              onChange={e => {
-                const v = e.target.value;
-                setAttrs(prev => prev.map((a, i) => i === idx ? { ...a, key: v } : a));
-              }}
-            />
-            <input
-              className="attr-input" placeholder="Valor"
-              value={attr.value}
-              onChange={e => {
-                const v = e.target.value;
-                setAttrs(prev => prev.map((a, i) => i === idx ? { ...a, value: v } : a));
-              }}
-            />
-            <button className="small-btn cancel" onClick={() => rmAttrField(idx)}>×</button>
-          </div>
-        ))}
-        <button type="button" className="small-btn add" onClick={addAttrField}>+</button>
-
+        {/* ---- imagen ---- */}
         <label>Imagen:
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </label>
+        {imagePreview && (
+          <div className="image-preview">
+            <img src={imagePreview} alt="Preview" />
+          </div>
+        )}
 
-        {imagePreview && <div className="image-preview"><img src={imagePreview} /></div>}
-        {uploading && <p>Subiendo imagen...</p>}
+        {/* ---- atributos extra ---- */}
+        <div className="attributes-section">
+          <h3>Atributos adicionales</h3>
+          {attributes.map((attr, i) => (
+            <div key={i} className="attribute-row">
+              <input
+                type="text"
+                placeholder="Clave"
+                value={attr.key}
+                onChange={e => updateAttribute(i, 'key', e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Valor"
+                value={attr.value}
+                onChange={e => updateAttribute(i, 'value', e.target.value)}
+              />
+              <button
+                type="button"
+                className="small-btn danger"
+                onClick={() => removeAttributeField(i)}
+              >×</button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="small-btn"
+            onClick={addAttributeField}
+          >+ Agregar atributo</button>
+        </div>
 
-        <div className="modal-buttons">
-          <button onClick={handleAdd}>Agregar</button>
-          <button className="cancel" onClick={handleClose}>Cancelar</button>
+        {/* ---- botones de acción ---- */}
+        <div className="modal-actions">
+          <button
+            type="button"
+            className="btn cancel"
+            onClick={handleClose}
+            disabled={uploading}
+          >Cancelar</button>
+          <button
+            type="button"
+            className="btn save"
+            onClick={handleAdd}
+            disabled={uploading}
+          >{uploading ? 'Guardando...' : 'Guardar'}</button>
         </div>
       </div>
     </div>

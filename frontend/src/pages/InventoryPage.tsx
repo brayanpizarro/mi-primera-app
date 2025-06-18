@@ -162,11 +162,12 @@ const InventoryPage = () => {
       <div className="controls">
         <input
           type="text"
-          placeholder="Buscar por nombre o descripción..."
+          placeholder="Buscar por nombre o atributos..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
         />
+      
 
         <select
           value={selectedLocation}

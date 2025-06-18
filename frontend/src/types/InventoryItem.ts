@@ -1,3 +1,9 @@
+export interface InventoryAttribute {
+  id: number;
+  key: string;
+  value: string;
+}
+
 export interface InventoryItem {
   id: number;
   name: string;
@@ -8,5 +14,5 @@ export interface InventoryItem {
   status: string;
   createdAt: string; 
   imageUrl?: string;
-  customAttributes?: Record<string, string>;
+  attributes: InventoryAttribute[];
 }
