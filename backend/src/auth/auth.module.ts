@@ -4,6 +4,9 @@ import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstanst } from './constants/jwt.constants'; // Importar constantes de JWT
+import { PassportModule } from '@nestjs/passport';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 /**
  * Módulo de autenticación
@@ -16,14 +19,16 @@ import { jwtConstanst } from './constants/jwt.constants'; // Importar constantes
  */
 @Module({
   imports: [
+    ConfigModule,
     UsersModule,
+    PassportModule,
     JwtModule.register({
       global: true, // Hacer que el módulo JWT esté disponible en toda la aplicación  
       secret: jwtConstanst.secret,// Clave secreta para firmar el token  
       signOptions: { expiresIn: '1d' }, // Opciones de firma del token (tiempo de expiración)
-    })
+    }),
   ], // Importar el servicio de usuarios
   controllers: [AuthController], // Controlador de autenticación
-  providers: [AuthService] // Servicio de autenticación
+  providers: [AuthService, GoogleStrategy] // Servicio de autenticación
 })
 export class AuthModule {}

@@ -2,12 +2,13 @@
  * Controlador que maneja todas las rutas relacionadas con la autenticación
  * Incluye endpoints para registro, inicio de sesión y perfil de usuario
  */
-import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './guard/auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -53,5 +54,23 @@ export class AuthController {
     profile(@Req() req: Request) {
         return (req as any).user;
     }
-    
+
+    @Get('google')
+    @UseGuards(PassportAuthGuard('google'))
+    async googleAuth() {
+        // This endpoint initiates the Google OAuth flow
+    }
+
+    @Get('google/callback')
+    @UseGuards(PassportAuthGuard('google'))
+    async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+        const result = await this.authService.googleLogin(req);
+        // Redirect to frontend with token and user info in the URL
+        return res.redirect(
+            `http://localhost:5173/login?token=${result.token}` +
+            `&name=${encodeURIComponent(result.user.name)}` +
+            `&email=${encodeURIComponent(result.user.email)}` +
+            `&role=${result.user.role}`
+        );
+    }
 }

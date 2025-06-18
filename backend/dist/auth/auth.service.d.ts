@@ -2,6 +2,7 @@ import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from 'src/users/entities/user-role.enum';
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
@@ -13,7 +14,17 @@ export declare class AuthService {
             name: string;
             email: string;
             rut: string;
-            role: import("../users/entities/user-role.enum").UserRole;
+            role: UserRole;
+        };
+    }>;
+    googleLogin(req: any): Promise<{
+        token: string;
+        user: {
+            name: string;
+            email: string;
+            rut: string;
+            role: UserRole;
+            picture: any;
         };
     }>;
 }

@@ -13,21 +13,26 @@ const auth_service_1 = require("./auth.service");
 const users_module_1 = require("../users/users.module");
 const jwt_1 = require("@nestjs/jwt");
 const jwt_constants_1 = require("./constants/jwt.constants");
+const passport_1 = require("@nestjs/passport");
+const google_strategy_1 = require("./strategies/google.strategy");
+const config_1 = require("@nestjs/config");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule,
             users_module_1.UsersModule,
+            passport_1.PassportModule,
             jwt_1.JwtModule.register({
                 global: true,
                 secret: jwt_constants_1.jwtConstanst.secret,
                 signOptions: { expiresIn: '1d' },
-            })
+            }),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService]
+        providers: [auth_service_1.AuthService, google_strategy_1.GoogleStrategy]
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map
