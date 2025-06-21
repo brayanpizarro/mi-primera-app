@@ -1,29 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Register.css';
 import axios from 'axios';
-import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import './Register.css';
 
 const EditProfile = () => {
-  const { user } = useContext(UserContext);
+  const { user, login } = useContext(UserContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    password:'',
+    currentPassword: '',
+    newPassword: '',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
-  // Cargar datos del usuario actual
+  // Verificar autenticación al cargar el componente
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name,
-        password: user.password,
-      });
+    // Obtener datos de localStorage
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    if (!storedUser || !token) {
+      navigate('/login');
+      return;
     }
-  }, [user]);
+
+    try {
+      const parsedUser = JSON.parse(storedUser);
+      console.log('Datos del usuario:', parsedUser);
+
+      if (!parsedUser.rut) {
+        console.error('No se encontró RUT de usuario en:', parsedUser);
+        navigate('/login');
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        name: parsedUser.name || '',
+      }));
+    } catch (e) {
+      console.error('Error al parsear usuario:', e);
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,29 +54,50 @@ const EditProfile = () => {
     }));
   };
 
-  const handleRoleChange = (role: 'user' | 'admin') => {
-    setFormData(prev => ({
-      ...prev,
-      role
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      await axios.patch(`http://localhost:3000/api/v1/users/${user.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`
-        }
-      });
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
 
-      navigate('/inventory');
+      if (!storedUser || !token) {
+        throw new Error('No hay sesión activa');
+      }
+
+      const parsedUser = JSON.parse(storedUser);
+      console.log('Enviando actualización para:', parsedUser); // Debug
+
+      const updateData = {
+        ...(formData.name && { name: formData.name }),
+        ...(formData.currentPassword && { currentPassword: formData.currentPassword }),
+        ...(formData.newPassword && { newPassword: formData.newPassword })
+      };
+
+      const response = await axios.patch(
+        `http://localhost:3000/api/v1/users/by-rut/${parsedUser.rut}`,
+        updateData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      console.log('Respuesta del servidor:', response.data); // Debug
+
+      if (response.data) {
+        const updatedUser = { ...parsedUser, ...response.data };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        login(updatedUser);
+        navigate('/profile');
+      }
     } catch (err: any) {
-      setError('Error al actualizar perfil');
-      console.error(err);
+      console.error('Error detallado:', err);
+      setError(err.response?.data?.message || 'Error al actualizar el perfil');
     } finally {
       setIsLoading(false);
     }
@@ -85,35 +127,25 @@ const EditProfile = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Correo</label>
+            <label className="form-label">Contraseña Actual</label>
             <input 
-              type="email" 
+              type="password" 
               className="form-input"
-              required
-              name="email"
-              value={formData.email}
+              name="currentPassword"
+              value={formData.currentPassword}
               onChange={handleChange}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Rol</label>
-            <div className="role-buttons-container">
-              <button
-                type="button"
-                className={`role-button ${formData.role === 'user' ? 'active' : ''}`}
-                onClick={() => handleRoleChange('user')}
-              >
-                Usuario
-              </button>
-              <button
-                type="button"
-                className={`role-button ${formData.role === 'admin' ? 'active' : ''}`}
-                onClick={() => handleRoleChange('admin')}
-              >
-                Administrador
-              </button>
-            </div>
+            <label className="form-label">Nueva Contraseña</label>
+            <input 
+              type="password" 
+              className="form-input"
+              name="newPassword"
+              value={formData.newPassword}
+              onChange={handleChange}
+            />
           </div>
 
           <button 

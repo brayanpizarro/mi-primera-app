@@ -28,3 +28,15 @@ export const registerUser = async (userData: {
     });
     return response.data;
 };
+export const updateuser = async (userId: number, userData: {
+    username?: string;
+    email?: string;
+    password?: string;
+}) => {
+    const response = await axios.patch(`${API_URL}/users/${userId}`, userData, {
+        headers: {  
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Solo accesible con token de admin
+        }
+    }); 
+    return response.data;
+};

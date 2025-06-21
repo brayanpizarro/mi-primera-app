@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import './Navbar.css';
 import '../pages/Register.css';
-
+import ucnLogo from '../assets/ucnLogo-b0e5fe78.png';
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useContext(UserContext);
@@ -21,6 +21,9 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
+      <div className="navbar-brand">
+        <img src={ucnLogo} alt="UCN Logo" className="navbar-logo" />
+      </div>
       <div className="navbar-brand">
         <span>StockMind UCN</span>
       </div>

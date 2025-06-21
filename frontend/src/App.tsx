@@ -6,6 +6,7 @@ import RegisterUser from './pages/RegisterUser';
 import ProtectedRoute from './components/ProtectedRoute';
 import { UserProvider } from './context/UserContext';
 import Navbar from './components/Navbar';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
             {/* Rutas públicas */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterUser />} />
-
+            <Route path="/editprofile" element={<EditProfile />} />
             {/* Rutas protegidas para admin */}
             <Route path="/inventory" element={
               <ProtectedRoute requiredRole="admin">
