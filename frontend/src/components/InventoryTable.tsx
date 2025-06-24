@@ -14,13 +14,11 @@ interface Props {
 
 const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) => {
   const [modalImage, setModalImage] = useState<string | null>(null);
-
- 
   const [deleteRow, setDeleteRow] = useState<number>(-1);
   const [deleteQty, setDeleteQty] = useState<number>(1);
 
   return (
-    <>
+    <div className="inventory-table-background">
       <table className="inventory-table">
         <thead>
           <tr>
@@ -158,7 +156,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

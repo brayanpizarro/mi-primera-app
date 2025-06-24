@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryPage from './pages/InventoryPage';
 import InventoryPageUser from './pages/InventoryPageUser'
 import Login from './pages/Login';
@@ -15,10 +15,20 @@ function App() {
         <Navbar />
         <div className="app-container">
           <Routes>
+            {/* Ruta por defecto - redirige al login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
             {/* Rutas públicas */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterUser />} />
-            <Route path="/editprofile" element={<EditProfile />} />
+
+            {/* Rutas protegidas */}
+            <Route path="/editprofile" element={
+              <ProtectedRoute>
+                <EditProfile />
+              </ProtectedRoute>
+            } />
+
             {/* Rutas protegidas para admin */}
             <Route path="/inventory" element={
               <ProtectedRoute requiredRole="admin">
@@ -26,14 +36,15 @@ function App() {
               </ProtectedRoute>
             } />
 
-        {/* Rutas protegidas para cualquier usuario autenticado */}
-        <Route path="/inventoryUser" element={
-          <ProtectedRoute requiredRole="user">
-            <InventoryPageUser />
-          </ProtectedRoute>
-        } />
+            {/* Rutas protegidas para cualquier usuario autenticado */}
+            <Route path="/inventoryUser" element={
+              <ProtectedRoute>
+                <InventoryPageUser />
+              </ProtectedRoute>
+            } />
 
-            {/* Otras rutas protegidas pueden agregarse aquí */}
+            {/* Ruta para capturar rutas no definidas */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </div>
       </Router>

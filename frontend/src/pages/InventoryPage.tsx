@@ -155,151 +155,153 @@ const InventoryPage = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
-    <div className="inventory-container">
-      <h1>Inventario</h1>
-      {message && <div className="success-message">{message}</div>}
+    <div className="inventory-page-background">
+      <div className="inventory-container">
+        <h1>Inventario</h1>
+        {message && <div className="success-message">{message}</div>}
 
-      <div className="controls">
-        <input
-          type="text"
-          placeholder="Buscar por nombre o descripción..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
-        />
+        <div className="controls">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o descripción..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
 
-        <select
-          value={selectedLocation}
-          onChange={(e) => setSelectedLocation(e.target.value)}
-          className="filter-select"
-        >
-          <option value="">Todas las ubicaciones</option>
-          {locations.map((loc) => (
-            <option key={loc} value={loc}>{loc}</option>
-          ))}
-        </select>
+          <select
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Todas las ubicaciones</option>
+            {locations.map((loc) => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
 
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="filter-select"
-        >
-          <option value="">Todos los estados</option>
-          {statuses
-            .filter((status) => status.trim() !== '') 
-            .map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))
-          }
-        </select>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">Todos los estados</option>
+            {statuses
+              .filter((status) => status.trim() !== '') 
+              .map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))
+            }
+          </select>
 
-        <select
-          value={sortField}
-          onChange={(e) => setSortField(e.target.value as 'price' | 'createdAt' | 'quantity')}
-          className="filter-select"
-        >
-          <option value="createdAt">Ordenar por fecha</option>
-          <option value="price">Ordenar por precio</option>
-          <option value="quantity">Ordenar por cantidad</option>
-        </select>
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value as 'price' | 'createdAt' | 'quantity')}
+            className="filter-select"
+          >
+            <option value="createdAt">Ordenar por fecha</option>
+            <option value="price">Ordenar por precio</option>
+            <option value="quantity">Ordenar por cantidad</option>
+          </select>
 
-        <select
-          value={sortDirection}
-          onChange={(e) => setSortDirection(e.target.value as 'asc' | 'desc')}
-          className="filter-select"
-        >
-          <option value="asc">Ascendente</option>
-          <option value="desc">Descendente</option>
-        </select>
+          <select
+            value={sortDirection}
+            onChange={(e) => setSortDirection(e.target.value as 'asc' | 'desc')}
+            className="filter-select"
+          >
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
 
-        <button className="add-button" onClick={() => setAddingItem(true)}>
-          + Agregar Producto
-        </button>
-      </div>
+          <button className="add-button" onClick={() => setAddingItem(true)}>
+            + Agregar Producto
+          </button>
+        </div>
 
-      {loading ? (
-        <p>Cargando...</p>
-      ) : (
-        <>
-          <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+        {loading ? (
+          <div className="loading">Cargando inventario...</div>
+        ) : (
+          <>
+            <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
 
-          <div className="pagination-controls">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              &laquo;
-            </button>
+            <div className="pagination-controls">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                &laquo;
+              </button>
 
-            {(() => {
-              const maxVisiblePages = 5;
-              const half = Math.floor(maxVisiblePages / 2);
-              let startPage = Math.max(1, currentPage - half);
-              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-              if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-              }
-
-              const pages = [];
-              for (let i = startPage; i <= endPage; i++) {
-                pages.push(
-                  <button
-                    key={i}
-                    className={i === currentPage ? 'active-page' : ''}
-                    onClick={() => setCurrentPage(i)}
-                  >
-                    {i}
-                  </button>
-                );
-              }
-              return pages;
-            })()}
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              &raquo;
-            </button>
-          </div>
-
-          {addingItem && (
-            <AddModal
-              onAdd={async (newItem) => {
-                try {
-                  await createInventoryItem(newItem);
-                  setAddingItem(false);
-                  setMessage(`"${newItem.name}" agregado correctamente`);
-                  await reloadInventory();
-                  setTimeout(() => setMessage(''), 3000);
-                } catch (err) {
-                  console.error('Error al agregar:', err);
-                  alert('No se pudo agregar el producto.');
+              {(() => {
+                const maxVisiblePages = 5;
+                const half = Math.floor(maxVisiblePages / 2);
+                let startPage = Math.max(1, currentPage - half);
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                if (endPage - startPage < maxVisiblePages - 1) {
+                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
                 }
-              }}
-              onCancel={() => setAddingItem(false)}
-            />
-          )}
 
-          {editingItem && (
-            <EditModal
-              item={editingItem}
-              onChange={handleEditChange}
-              onSave={handleSaveEdit}
-              onCancel={() => setEditingItem(null)}
-            />
-          )}
+                const pages = [];
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      className={i === currentPage ? 'active-page' : ''}
+                      onClick={() => setCurrentPage(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+                return pages;
+              })()}
 
-          {viewingItem && (
-            <ViewModal
-              item={viewingItem}
-              onClose={() => setViewingItem(null)}
-            />
-          )}
-        </>
-      )}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                &raquo;
+              </button>
+            </div>
+
+            {addingItem && (
+              <AddModal
+                onAdd={async (newItem) => {
+                  try {
+                    await createInventoryItem(newItem);
+                    setAddingItem(false);
+                    setMessage(`"${newItem.name}" agregado correctamente`);
+                    await reloadInventory();
+                    setTimeout(() => setMessage(''), 3000);
+                  } catch (err) {
+                    console.error('Error al agregar:', err);
+                    alert('No se pudo agregar el producto.');
+                  }
+                }}
+                onCancel={() => setAddingItem(false)}
+              />
+            )}
+
+            {editingItem && (
+              <EditModal
+                item={editingItem}
+                onChange={handleEditChange}
+                onSave={handleSaveEdit}
+                onCancel={() => setEditingItem(null)}
+              />
+            )}
+
+            {viewingItem && (
+              <ViewModal
+                item={viewingItem}
+                onClose={() => setViewingItem(null)}
+              />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
