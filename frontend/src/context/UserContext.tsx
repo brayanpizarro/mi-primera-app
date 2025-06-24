@@ -3,10 +3,11 @@ import React, { createContext, useState, ReactNode } from 'react';
 interface User {
   id?: number;
   name: string;
-  password?: string; // Optional for login, required for registration
+  password?: string;
   email: string;
   role: string;
   rut: string;
+  token?: string; // Añadir token al interface
 }
 
 interface UserContextType {
@@ -30,6 +31,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+    if (userData.token) {
+      localStorage.setItem('token', userData.token);
+    }
   };
 
   const logout = () => {

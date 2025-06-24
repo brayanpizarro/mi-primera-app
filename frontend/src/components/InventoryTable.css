@@ -83,6 +83,12 @@
   flex-direction: row;
   gap: 0.3rem;
 }
+.inventory-table-wrapper {
+  background-color: #f0f4f8; /* color celeste claro, puedes cambiarlo */
+  padding: 1rem;
+  border-radius: 8px;
+  min-height: 100vh; /* o el alto que necesites */
+}
 
 /* Botones de confirmación y cancelación */
 .inventory-confirm-btn,
@@ -177,4 +183,14 @@
   font-size: 1.2em;
   margin-left: 6px;
   user-select: none;
+}
+
+.inventory-table-background {
+  background: linear-gradient(135deg, #e3e9f7 0%, #f7fafd 100%);
+  min-height: 80vh;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  margin: 2rem auto;
+  max-width: 1200px;
 }

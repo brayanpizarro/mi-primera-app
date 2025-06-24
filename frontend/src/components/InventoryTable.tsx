@@ -18,7 +18,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
   const [deleteQty, setDeleteQty] = useState<number>(1);
 
   return (
-    <>
+    <div className="inventory-table-background">
       <table className="inventory-table">
         <thead>
           <tr>
@@ -155,7 +155,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
