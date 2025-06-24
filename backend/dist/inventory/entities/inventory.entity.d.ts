@@ -1,3 +1,4 @@
+import { InventoryAttribute } from './inventory-attribute.entity';
 export declare class Inventory {
     id: number;
     name: string;
@@ -6,7 +7,7 @@ export declare class Inventory {
     price: number;
     quantity: number;
     status: string;
-    customAttributes?: Record<string, any>;
     imageUrl?: string;
+    attributes: InventoryAttribute[];
     createdAt: Date;
 }

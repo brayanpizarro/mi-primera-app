@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateInventoryDto = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const inventory_attribute_dto_1 = require("./inventory-attribute.dto");
 class CreateInventoryDto {
     name;
     description;
@@ -20,7 +21,7 @@ class CreateInventoryDto {
     quantity;
     status;
     imageUrl;
-    customAttributes;
+    attributes;
 }
 exports.CreateInventoryDto = CreateInventoryDto;
 __decorate([
@@ -60,7 +61,9 @@ __decorate([
 ], CreateInventoryDto.prototype, "imageUrl", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsObject)(),
-    __metadata("design:type", Object)
-], CreateInventoryDto.prototype, "customAttributes", void 0);
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => inventory_attribute_dto_1.InventoryAttributeDto),
+    __metadata("design:type", Array)
+], CreateInventoryDto.prototype, "attributes", void 0);
 //# sourceMappingURL=create-inventory.dto.js.map

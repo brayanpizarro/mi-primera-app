@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
-
 import * as bcryptjs from 'bcryptjs'; // Importar bcrypt para encriptar contraseñas
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from 'src/users/entities/user-role.enum';
 
 /**
  * Servicio de autenticación
@@ -72,6 +72,48 @@ export class AuthService {
                 email: user.email,
                 rut: user.rut,
                 role: user.role
+            }
+        };
+    }
+
+    async googleLogin(req) {
+        if (!req.user) {
+            throw new UnauthorizedException('No user from google');
+        }
+
+        const { email, firstName, lastName, picture } = req.user;
+        
+        // Check if user exists
+        let user = await this.usersService.findOneByEmail(email);
+        
+        // If user doesn't exist, create a new one
+        if (!user) {
+            const newUser = {
+                email,
+                name: `${firstName} ${lastName}`,
+                password: Math.random().toString(36).slice(-8), // Generate random password
+                role: UserRole.USER, // Default role
+                rut: '0-0', // Default RUT for Google users
+            };
+            user = await this.usersService.create(newUser);
+        }
+
+        const payload = {
+            email: user.email,
+            rut: user.rut,
+            role: user.role
+        };
+
+        const token = this.jwtService.sign(payload);
+
+        return {
+            token,
+            user: {
+                name: user.name,
+                email: user.email,
+                rut: user.rut,
+                role: user.role,
+                picture
             }
         };
     }

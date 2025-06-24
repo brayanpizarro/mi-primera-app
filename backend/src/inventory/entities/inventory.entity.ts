@@ -1,5 +1,6 @@
 // src/inventory/entities/inventory.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { InventoryAttribute } from './inventory-attribute.entity';
 
 @Entity()
 export class Inventory {
@@ -24,11 +25,11 @@ export class Inventory {
   @Column({nullable: true})
   status: string;
 
-  @Column('json', { nullable: true })
-  customAttributes?: Record<string, any>;
-
   @Column({ nullable: true })
   imageUrl?: string;
+
+  @OneToMany(() => InventoryAttribute, attr => attr.inventory)
+  attributes: InventoryAttribute[];
 
   @CreateDateColumn()
   createdAt: Date;

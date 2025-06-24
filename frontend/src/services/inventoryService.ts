@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { InventoryItem } from '../types/InventoryItem';
+import { InventoryItem, InventoryAttribute } from '../types/InventoryItem';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -34,6 +34,20 @@ export const getInventoryLocations = () => {
 
 export const getInventoryStatuses = () => {
   return axios.get<string[]>(`${API_URL}/inventory/statuses`);
+};
+
+export const getInventoryAttributeKeys = () => {
+  return axios.get<string[]>(`${API_URL}/inventory/attributes`);
+};
+
+export const getInventoryAttributeValues = (key: string) => {
+  return axios.get<string[]>(`${API_URL}/inventory/attributes/${key}`);
+};
+
+export const findInventoryByAttribute = (key: string, value: string) => {
+  return axios.get<InventoryItem[]>(`${API_URL}/inventory/attributes/${key}`, {
+    params: { value }
+  });
 };
 
 export const deleteInventoryItem = (id: number) =>

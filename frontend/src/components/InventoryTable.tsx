@@ -64,38 +64,38 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
               <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
 
               {/* ───── ACCIONES ───── */}
-<td
-  className="inventory-action-cell"
-  onClick={e => e.stopPropagation()}
->
-  {/* Icono que indica customAttributes */}
-  {item.customAttributes && Object.keys(item.customAttributes).length > 0 && (
-    <div className="custom-attr-icon" title="Tiene atributos personalizados">
-      <FaTag />
-    </div>
-  )}
+              <td
+                className="inventory-action-cell"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Icono que indica atributos */}
+                {item.attributes && item.attributes.length > 0 && (
+                  <div className="custom-attr-icon" title="Tiene atributos adicionales">
+                    <FaTag />
+                  </div>
+                )}
 
-  {deleteRow !== item.id ? (
-    <>
-      <button
-        className="inventory-icon-button"
-        onClick={() => onEdit(item.id)}
-      >
-        <FaEdit />
-      </button>
+                {deleteRow !== item.id ? (
+                  <>
+                    <button
+                      className="inventory-icon-button"
+                      onClick={() => onEdit(item.id)}
+                    >
+                      <FaEdit />
+                    </button>
 
-      <button
-        className="inventory-icon-button"
-        onClick={() => {
-          setDeleteRow(item.id);
-          setDeleteQty(1);
-        }}
-      >
-        <FaTrash />
-      </button>
-    </>
-  ) : (
-    <div className="inventory-delete-mode">
+                    <button
+                      className="inventory-icon-button"
+                      onClick={() => {
+                        setDeleteRow(item.id);
+                        setDeleteQty(1);
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </>
+                ) : (
+                  <div className="inventory-delete-mode">
                     <input
                       type="number"
                       min={1}
@@ -110,7 +110,6 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
                       }}
                     />
 
-                    
                     <div className="inventory-delete-buttons">
                       <button
                         className="inventory-confirm-btn"

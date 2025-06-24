@@ -1,16 +1,37 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import './Login.css';
 import axios from 'axios';
 import ucnLogo from '../assets/ucnLogo-b0e5fe78.png';
 import eicLogo from '../assets/eicLogo-586fa087.png';
+
 const Login = () => {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const { login } = useContext(UserContext);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const name = params.get('name');
+    const email = params.get('email');
+    const role = params.get('role');
+    const rut = params.get('rut') || '';
+    if (token && name && email && role) {
+      localStorage.setItem('token', token);
+      login({ name, email, role, rut });
+      // Redirigir según el rol
+      if (role === 'admin') {
+        navigate('/inventory');
+      } else {
+        navigate('/inventoryUser');
+      }
+    }
+  }, [login, navigate]);
 
   const formatRut = (rut: string) => {
     // Eliminar puntos y guión existentes
@@ -72,6 +93,10 @@ const Login = () => {
     setRut(value);
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:3000/api/v1/auth/google';
+  };
+
   return (
     <div className="login-wrapper">
       <div className="logos-container">
@@ -122,7 +147,23 @@ const Login = () => {
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
 
-         
+          <div className="divider">
+            <span>o</span>
+          </div>
+
+          <button 
+            type="button" 
+            className="google-button"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+          >
+            <img 
+              src="https://www.google.com/favicon.ico" 
+              alt="Google" 
+              className="google-icon"
+            />
+            Iniciar sesión con Google
+          </button>
         </form>
       </div>
     </div>

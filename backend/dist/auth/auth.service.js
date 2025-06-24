@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const bcryptjs = require("bcryptjs");
 const jwt_1 = require("@nestjs/jwt");
+const user_role_enum_1 = require("../users/entities/user-role.enum");
 let AuthService = class AuthService {
     usersService;
     jwtService;
@@ -55,6 +56,39 @@ let AuthService = class AuthService {
                 email: user.email,
                 rut: user.rut,
                 role: user.role
+            }
+        };
+    }
+    async googleLogin(req) {
+        if (!req.user) {
+            throw new common_1.UnauthorizedException('No user from google');
+        }
+        const { email, firstName, lastName, picture } = req.user;
+        let user = await this.usersService.findOneByEmail(email);
+        if (!user) {
+            const newUser = {
+                email,
+                name: `${firstName} ${lastName}`,
+                password: Math.random().toString(36).slice(-8),
+                role: user_role_enum_1.UserRole.USER,
+                rut: '0-0',
+            };
+            user = await this.usersService.create(newUser);
+        }
+        const payload = {
+            email: user.email,
+            rut: user.rut,
+            role: user.role
+        };
+        const token = this.jwtService.sign(payload);
+        return {
+            token,
+            user: {
+                name: user.name,
+                email: user.email,
+                rut: user.rut,
+                role: user.role,
+                picture
             }
         };
     }

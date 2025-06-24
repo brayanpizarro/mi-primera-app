@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const register_dto_1 = require("./dto/register.dto");
 const login_dto_1 = require("./dto/login.dto");
 const auth_guard_1 = require("./guard/auth.guard");
+const passport_1 = require("@nestjs/passport");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -31,6 +32,15 @@ let AuthController = class AuthController {
     }
     profile(req) {
         return req.user;
+    }
+    async googleAuth() {
+    }
+    async googleAuthCallback(req, res) {
+        const result = await this.authService.googleLogin(req);
+        return res.redirect(`http://localhost:5173/login?token=${result.token}` +
+            `&name=${encodeURIComponent(result.user.name)}` +
+            `&email=${encodeURIComponent(result.user.email)}` +
+            `&role=${result.user.role}`);
     }
 };
 exports.AuthController = AuthController;
@@ -56,6 +66,22 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "profile", null);
+__decorate([
+    (0, common_1.Get)('google'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleAuth", null);
+__decorate([
+    (0, common_1.Get)('google/callback'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleAuthCallback", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

@@ -4,7 +4,7 @@ import { UpdateInventoryDto } from './dto/update-inventory.dto';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
-    create(dto: CreateInventoryDto): Promise<import("./entities/inventory.entity").Inventory>;
+    create(dto: CreateInventoryDto): Promise<import("./entities/inventory.entity").Inventory | null>;
     findAll(filter?: string, page?: string, limit?: string, location?: string, status?: string, sort?: string, direction?: 'ASC' | 'DESC'): Promise<{
         data: import("./entities/inventory.entity").Inventory[];
         total: number;
@@ -13,7 +13,9 @@ export declare class InventoryController {
     }>;
     getLocations(): Promise<string[]>;
     getStatuses(): Promise<string[]>;
-    findOne(id: string): Promise<import("./entities/inventory.entity").Inventory>;
-    update(id: string, dto: UpdateInventoryDto): Promise<import("./entities/inventory.entity").Inventory>;
+    getAttributeKeys(): Promise<string[]>;
+    findByAttribute(key: string, value: string): Promise<string[] | import("./entities/inventory.entity").Inventory[]>;
+    findOne(id: string): Promise<import("./entities/inventory.entity").Inventory | null>;
+    update(id: string, dto: UpdateInventoryDto): Promise<import("./entities/inventory.entity").Inventory | null>;
     remove(id: string): Promise<import("./entities/inventory.entity").Inventory>;
 }

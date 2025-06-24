@@ -1,5 +1,6 @@
-import { IsString, IsNumber, IsOptional, Min, IsObject } from 'class-validator';
+import { IsString, IsNumber, IsOptional, Min, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { InventoryAttributeDto } from './inventory-attribute.dto';
 
 export class CreateInventoryDto {
   @IsString()
@@ -31,6 +32,8 @@ export class CreateInventoryDto {
   imageUrl?: string;
 
   @IsOptional()
-  @IsObject()
-  customAttributes?: Record<string, any>;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => InventoryAttributeDto)
+  attributes?: InventoryAttributeDto[];
 }

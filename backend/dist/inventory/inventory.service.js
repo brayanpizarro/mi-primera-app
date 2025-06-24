@@ -17,32 +17,43 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const inventory_entity_1 = require("./entities/inventory.entity");
+const inventory_attribute_entity_1 = require("./entities/inventory-attribute.entity");
 let InventoryService = class InventoryService {
     inventoryRepo;
-    constructor(inventoryRepo) {
+    attributeRepo;
+    constructor(inventoryRepo, attributeRepo) {
         this.inventoryRepo = inventoryRepo;
+        this.attributeRepo = attributeRepo;
     }
-    create(dto) {
-        const newItem = this.inventoryRepo.create(dto);
-        return this.inventoryRepo.save(newItem);
+    async create(dto) {
+        const { attributes, ...inventoryData } = dto;
+        const newItem = this.inventoryRepo.create(inventoryData);
+        const savedItem = await this.inventoryRepo.save(newItem);
+        if (attributes && attributes.length > 0) {
+            const attributeEntities = attributes.map(attr => this.attributeRepo.create({
+                ...attr,
+                inventory: savedItem
+            }));
+            await this.attributeRepo.save(attributeEntities);
+        }
+        return this.findOne(savedItem.id);
     }
     async findAllPaginated(search, page, limit, location, status, sort = 'createdAt', direction = 'DESC') {
-        const where = {};
+        const queryBuilder = this.inventoryRepo
+            .createQueryBuilder('inventory')
+            .leftJoinAndSelect('inventory.attributes', 'attributes');
         if (search) {
-            where.name = (0, typeorm_2.ILike)(`%${search}%`);
+            queryBuilder.where('(inventory.name ILIKE :search OR attributes.value ILIKE :search)', { search: `%${search}%` });
         }
         if (location) {
-            where.location = location;
+            queryBuilder.andWhere('inventory.location = :location', { location });
         }
         if (status) {
-            where.status = status;
+            queryBuilder.andWhere('inventory.status = :status', { status });
         }
-        const [data, total] = await this.inventoryRepo.findAndCount({
-            where,
-            order: { [sort]: direction },
-            skip: (page - 1) * limit,
-            take: limit,
-        });
+        queryBuilder.orderBy(`inventory.${sort}`, direction);
+        queryBuilder.skip((page - 1) * limit).take(limit);
+        const [data, total] = await queryBuilder.getManyAndCount();
         return {
             data,
             total,
@@ -50,14 +61,29 @@ let InventoryService = class InventoryService {
             totalPages: Math.ceil(total / limit),
         };
     }
-    findOne(id) {
-        return this.inventoryRepo.findOneByOrFail({ id });
+    async findOne(id) {
+        return this.inventoryRepo.findOne({
+            where: { id },
+            relations: ['attributes']
+        });
     }
     async update(id, dto) {
-        const item = await this.inventoryRepo.preload({ id, ...dto });
+        const { attributes, ...inventoryData } = dto;
+        const item = await this.inventoryRepo.preload({ id, ...inventoryData });
         if (!item)
             throw new common_1.NotFoundException(`Item #${id} not found`);
-        return this.inventoryRepo.save(item);
+        const savedItem = await this.inventoryRepo.save(item);
+        if (attributes) {
+            await this.attributeRepo.delete({ inventory: { id } });
+            if (attributes.length > 0) {
+                const attributeEntities = attributes.map(attr => this.attributeRepo.create({
+                    ...attr,
+                    inventory: savedItem
+                }));
+                await this.attributeRepo.save(attributeEntities);
+            }
+        }
+        return this.findOne(savedItem.id);
     }
     async remove(id) {
         const item = await this.inventoryRepo.findOneBy({ id });
@@ -81,11 +107,36 @@ let InventoryService = class InventoryService {
             .getRawMany();
         return result.map(row => row.status);
     }
+    async findByAttribute(key, value) {
+        return this.inventoryRepo
+            .createQueryBuilder('inventory')
+            .leftJoinAndSelect('inventory.attributes', 'attributes')
+            .where('attributes.key = :key', { key })
+            .andWhere('attributes.value = :value', { value })
+            .getMany();
+    }
+    async getUniqueAttributeValues(key) {
+        const result = await this.attributeRepo
+            .createQueryBuilder('attribute')
+            .select('DISTINCT attribute.value', 'value')
+            .where('attribute.key = :key', { key })
+            .getRawMany();
+        return result.map(row => row.value);
+    }
+    async getUniqueAttributeKeys() {
+        const result = await this.attributeRepo
+            .createQueryBuilder('attribute')
+            .select('DISTINCT attribute.key', 'key')
+            .getRawMany();
+        return result.map(row => row.key);
+    }
 };
 exports.InventoryService = InventoryService;
 exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_entity_1.Inventory)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(inventory_attribute_entity_1.InventoryAttribute)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], InventoryService);
 //# sourceMappingURL=inventory.service.js.map
