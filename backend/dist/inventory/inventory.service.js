@@ -39,11 +39,13 @@ let InventoryService = class InventoryService {
         return this.findOne(savedItem.id);
     }
     async findAllPaginated(search, page, limit, location, status, sort = 'createdAt', direction = 'DESC') {
+        console.log('🔍 Buscando inventario con parámetros:', { search, page, limit, location, status, sort, direction });
         const queryBuilder = this.inventoryRepo
             .createQueryBuilder('inventory')
             .leftJoinAndSelect('inventory.attributes', 'attributes');
-        if (search) {
-            queryBuilder.where('(inventory.name ILIKE :search OR attributes.value ILIKE :search)', { search: `%${search}%` });
+        if (search && search.trim() !== '') {
+            const searchTerm = `%${search.trim()}%`;
+            queryBuilder.where('(inventory.name ILIKE :search OR inventory.description ILIKE :search OR attributes.value ILIKE :search OR attributes.key ILIKE :search)', { search: searchTerm });
         }
         if (location) {
             queryBuilder.andWhere('inventory.location = :location', { location });
@@ -54,8 +56,15 @@ let InventoryService = class InventoryService {
         queryBuilder.orderBy(`inventory.${sort}`, direction);
         queryBuilder.skip((page - 1) * limit).take(limit);
         const [data, total] = await queryBuilder.getManyAndCount();
+        console.log('📊 Resultados encontrados:', { total, dataLength: data.length });
+        const itemsWithAttributes = await Promise.all(data.map(async (item) => {
+            if (!item.attributes) {
+                item.attributes = [];
+            }
+            return item;
+        }));
         return {
-            data,
+            data: itemsWithAttributes,
             total,
             page,
             totalPages: Math.ceil(total / limit),
@@ -129,6 +138,9 @@ let InventoryService = class InventoryService {
             .select('DISTINCT attribute.key', 'key')
             .getRawMany();
         return result.map(row => row.key);
+    }
+    async getTotalItems() {
+        return this.inventoryRepo.count();
     }
 };
 exports.InventoryService = InventoryService;

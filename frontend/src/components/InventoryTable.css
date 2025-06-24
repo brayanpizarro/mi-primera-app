@@ -194,3 +194,41 @@
   margin: 2rem auto;
   max-width: 1200px;
 }
+
+/* Estilos para atributos en la tabla */
+.attributes-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.attribute-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attribute-more {
+  background-color: #f5f5f5;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-style: italic;
+  border: 1px solid #e0e0e0;
+}
+
+.no-attributes {
+  color: #999;
+  font-style: italic;
+  font-size: 0.85rem;
+}

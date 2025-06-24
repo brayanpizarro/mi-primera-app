@@ -17,9 +17,29 @@ import { UserRole } from '../users/entities/user-role.enum';
  * - Búsqueda por filtros
  */
 @Controller('inventory')
-@UseGuards(AuthGuard, RolesGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
+
+  /**
+   * Endpoint público para verificar la conexión a la base de datos
+   */
+  @Get('health')
+  async healthCheck() {
+    try {
+      const total = await this.inventoryService.getTotalItems();
+      return { 
+        status: 'OK', 
+        message: 'Conexión a la base de datos exitosa',
+        totalItems: total 
+      };
+    } catch (error) {
+      return { 
+        status: 'ERROR', 
+        message: 'Error de conexión a la base de datos',
+        error: error.message 
+      };
+    }
+  }
 
   /**
    * Crea un nuevo item en el inventario
@@ -28,6 +48,7 @@ export class InventoryController {
    * @roles ADMIN
    */
   @Post()
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   create(@Body() dto: CreateInventoryDto) {
     return this.inventoryService.create(dto);
@@ -40,21 +61,29 @@ export class InventoryController {
    * @roles ADMIN, USER
    */
   @Get()
-    @Roles(UserRole.ADMIN, UserRole.USER)
-    findAll(
-      @Query('filter') filter?: string,
-      @Query('page') page = '1',
-      @Query('limit') limit = '10',
-      @Query('location') location?: string,
-      @Query('status') status?: string,
-      @Query('sort') sort = 'createdAt',
-      @Query('direction') direction: 'ASC' | 'DESC' = 'DESC',
-    ) {
-      const pageNum = parseInt(page, 10);
-      const limitNum = parseInt(limit, 10);
-      return this.inventoryService.findAllPaginated(filter, pageNum, limitNum, location, status, sort, direction);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  findAll(
+    @Query('filter') filter?: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('location') location?: string,
+    @Query('status') status?: string,
+    @Query('sort') sort = 'createdAt',
+    @Query('direction') direction: 'ASC' | 'DESC' = 'DESC',
+  ) {
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    return this.inventoryService.findAllPaginated(
+      filter, 
+      pageNum, 
+      limitNum, 
+      location, 
+      status, 
+      sort, 
+      direction
+    );
   }
-
 
   /**
    * Obtiene un item específico por ID
@@ -62,44 +91,12 @@ export class InventoryController {
    * @returns Item encontrado
    * @roles ADMIN, USER
    */
-
-  @Get('locations')
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  async getLocations() {
-    return this.inventoryService.getUniqueLocations();
-  }
-  
-  @Get('statuses')
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  async getStatuses() {
-    return this.inventoryService.getUniqueStatuses();
-  }
-
-  @Get('attributes')
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  async getAttributeKeys() {
-    return this.inventoryService.getUniqueAttributeKeys();
-  }
-
-  @Get('attributes/:key')
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  async findByAttribute(
-    @Param('key') key: string,
-    @Query('value') value: string,
-  ) {
-    if (value) {
-      return this.inventoryService.findByAttribute(key, value);
-    }
-    return this.inventoryService.getUniqueAttributeValues(key);
-  }
-
   @Get(':id')
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.USER)
   findOne(@Param('id') id: string) {
     return this.inventoryService.findOne(+id);
   }
-
-
 
   /**
    * Actualiza un item existente
@@ -109,6 +106,7 @@ export class InventoryController {
    * @roles ADMIN
    */
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() dto: UpdateInventoryDto) {
     return this.inventoryService.update(+id, dto);
@@ -121,8 +119,51 @@ export class InventoryController {
    * @roles ADMIN
    */
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.inventoryService.remove(+id);
+  }
+
+  @Get('count')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getCount() {
+    const total = await this.inventoryService.getTotalItems();
+    return { total };
+  }
+
+  @Get('locations')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getLocations() {
+    return this.inventoryService.getUniqueLocations();
+  }
+  
+  @Get('statuses')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getStatuses() {
+    return this.inventoryService.getUniqueStatuses();
+  }
+
+  @Get('attributes')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async getAttributeKeys() {
+    return this.inventoryService.getUniqueAttributeKeys();
+  }
+
+  @Get('attributes/:key')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  async findByAttribute(
+    @Param('key') key: string,
+    @Query('value') value: string,
+  ) {
+    if (value) {
+      return this.inventoryService.findByAttribute(key, value);
+    }
+    return this.inventoryService.getUniqueAttributeValues(key);
   }
 }

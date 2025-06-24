@@ -42,14 +42,18 @@ export class InventoryService {
     sort: string = 'createdAt',
     direction: 'ASC' | 'DESC' = 'DESC',
   ) {
+    console.log('🔍 Buscando inventario con parámetros:', { search, page, limit, location, status, sort, direction });
+    
     const queryBuilder = this.inventoryRepo
       .createQueryBuilder('inventory')
       .leftJoinAndSelect('inventory.attributes', 'attributes');
 
-    if (search) {
+    // Búsqueda mejorada que incluye nombre, descripción, valores de atributos y claves de atributos
+    if (search && search.trim() !== '') {
+      const searchTerm = `%${search.trim()}%`;
       queryBuilder.where(
-        '(inventory.name ILIKE :search OR attributes.value ILIKE :search)',
-        { search: `%${search}%` }
+        '(inventory.name ILIKE :search OR inventory.description ILIKE :search OR attributes.value ILIKE :search OR attributes.key ILIKE :search)',
+        { search: searchTerm }
       );
     }
 
@@ -67,10 +71,23 @@ export class InventoryService {
     // Aplicar paginación
     queryBuilder.skip((page - 1) * limit).take(limit);
 
+    // Ejecutar la consulta
     const [data, total] = await queryBuilder.getManyAndCount();
+    
+    console.log('📊 Resultados encontrados:', { total, dataLength: data.length });
+
+    // Asegurar que los atributos estén cargados correctamente
+    const itemsWithAttributes = await Promise.all(
+      data.map(async (item) => {
+        if (!item.attributes) {
+          item.attributes = [];
+        }
+        return item;
+      })
+    );
 
     return {
-      data,
+      data: itemsWithAttributes,
       total,
       page,
       totalPages: Math.ceil(total / limit),
@@ -162,5 +179,9 @@ export class InventoryService {
       .getRawMany();
 
     return result.map(row => row.key);
+  }
+
+  async getTotalItems(): Promise<number> {
+    return this.inventoryRepo.count();
   }
 }
