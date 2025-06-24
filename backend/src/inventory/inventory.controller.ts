@@ -17,7 +17,7 @@ import { UserRole } from '../users/entities/user-role.enum';
  * - Búsqueda por filtros
  */
 @Controller('inventory')
-//@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
@@ -28,7 +28,7 @@ export class InventoryController {
    * @roles ADMIN
    */
   @Post()
-  //@Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   create(@Body() dto: CreateInventoryDto) {
     return this.inventoryService.create(dto);
   }
