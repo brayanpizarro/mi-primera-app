@@ -7,7 +7,8 @@ import {
   updateInventoryItem,
   createInventoryItem,
   deleteInventoryItem,
-  getInventoryStatuses
+  getInventoryStatuses,
+  getInventoryCount
 } from '../services/inventoryService';
 import EditModal from '../components/EditModal';
 import AddModal from '../components/AddModal';
@@ -32,7 +33,7 @@ const InventoryPage = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [locations, setLocations] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
-
+  
   useEffect(() => {
     setLoading(true);
     getInventory(
@@ -54,13 +55,12 @@ const InventoryPage = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortField, sortDirection, selectedLocation]);
-
+  }, [searchQuery, sortField, sortDirection, selectedLocation, selectedStatus]);
 
   useEffect(() => {
-  getInventoryLocations()
-    .then(res => setLocations(res.data))
-    .catch(err => console.error('Error al cargar ubicaciones:', err));
+    getInventoryLocations()
+      .then(res => setLocations(res.data))
+      .catch(err => console.error('Error al cargar ubicaciones:', err));
   }, []);
 
   useEffect(() => {

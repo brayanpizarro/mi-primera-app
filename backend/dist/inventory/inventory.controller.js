@@ -17,12 +17,31 @@ const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 const update_inventory_dto_1 = require("./dto/update-inventory.dto");
+const auth_guard_1 = require("../auth/guard/auth.guard");
+const roles_guard_1 = require("../auth/guard/roles.guard");
 const roles_decorator_1 = require("../auth/decorator/roles.decorator");
 const user_role_enum_1 = require("../users/entities/user-role.enum");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
         this.inventoryService = inventoryService;
+    }
+    async healthCheck() {
+        try {
+            const total = await this.inventoryService.getTotalItems();
+            return {
+                status: 'OK',
+                message: 'Conexión a la base de datos exitosa',
+                totalItems: total
+            };
+        }
+        catch (error) {
+            return {
+                status: 'ERROR',
+                message: 'Error de conexión a la base de datos',
+                error: error.message
+            };
+        }
     }
     create(dto) {
         return this.inventoryService.create(dto);
@@ -31,6 +50,19 @@ let InventoryController = class InventoryController {
         const pageNum = parseInt(page, 10);
         const limitNum = parseInt(limit, 10);
         return this.inventoryService.findAllPaginated(filter, pageNum, limitNum, location, status, sort, direction);
+    }
+    findOne(id) {
+        return this.inventoryService.findOne(+id);
+    }
+    update(id, dto) {
+        return this.inventoryService.update(+id, dto);
+    }
+    remove(id) {
+        return this.inventoryService.remove(+id);
+    }
+    async getCount() {
+        const total = await this.inventoryService.getTotalItems();
+        return { total };
     }
     async getLocations() {
         return this.inventoryService.getUniqueLocations();
@@ -47,19 +79,18 @@ let InventoryController = class InventoryController {
         }
         return this.inventoryService.getUniqueAttributeValues(key);
     }
-    findOne(id) {
-        return this.inventoryService.findOne(+id);
-    }
-    update(id, dto) {
-        return this.inventoryService.update(+id, dto);
-    }
-    remove(id) {
-        return this.inventoryService.remove(+id);
-    }
 };
 exports.InventoryController = InventoryController;
 __decorate([
+    (0, common_1.Get)('health'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "healthCheck", null);
+__decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_inventory_dto_1.CreateInventoryDto]),
@@ -67,6 +98,7 @@ __decorate([
 ], InventoryController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
     __param(0, (0, common_1.Query)('filter')),
     __param(1, (0, common_1.Query)('page')),
@@ -80,37 +112,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)('locations'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], InventoryController.prototype, "getLocations", null);
-__decorate([
-    (0, common_1.Get)('statuses'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], InventoryController.prototype, "getStatuses", null);
-__decorate([
-    (0, common_1.Get)('attributes'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], InventoryController.prototype, "getAttributeKeys", null);
-__decorate([
-    (0, common_1.Get)('attributes/:key'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    __param(0, (0, common_1.Param)('key')),
-    __param(1, (0, common_1.Query)('value')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], InventoryController.prototype, "findByAttribute", null);
-__decorate([
     (0, common_1.Get)(':id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -119,6 +122,7 @@ __decorate([
 ], InventoryController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -128,12 +132,55 @@ __decorate([
 ], InventoryController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('count'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getCount", null);
+__decorate([
+    (0, common_1.Get)('locations'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getLocations", null);
+__decorate([
+    (0, common_1.Get)('statuses'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getStatuses", null);
+__decorate([
+    (0, common_1.Get)('attributes'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getAttributeKeys", null);
+__decorate([
+    (0, common_1.Get)('attributes/:key'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __param(0, (0, common_1.Param)('key')),
+    __param(1, (0, common_1.Query)('value')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findByAttribute", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])

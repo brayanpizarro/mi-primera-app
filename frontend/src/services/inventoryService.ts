@@ -1,7 +1,35 @@
 import axios from 'axios';
 import { InventoryItem, InventoryAttribute } from '../types/InventoryItem';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+// Configurar interceptor para incluir el token automáticamente
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para manejar errores de autenticación
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const getInventory = (
   page = 1,
@@ -42,6 +70,14 @@ export const getInventoryAttributeKeys = () => {
 
 export const getInventoryAttributeValues = (key: string) => {
   return axios.get<string[]>(`${API_URL}/inventory/attributes/${key}`);
+};
+
+export const getInventoryCount = () => {
+  return axios.get(`${API_URL}/inventory/count`);
+};
+
+export const healthCheck = () => {
+  return axios.get(`${API_URL}/inventory/health`);
 };
 
 export const findInventoryByAttribute = (key: string, value: string) => {

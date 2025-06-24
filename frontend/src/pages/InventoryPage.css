@@ -53,6 +53,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .search-input {
@@ -71,6 +72,22 @@
   border: 1px solid #ccc;
   font-size: 1rem;
   min-width: 120px;
+}
+
+.filter-button {
+  padding: 0.5rem 1rem;
+  background-color: #6c757d;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(108, 117, 125, 0.4);
+  transition: background-color 0.3s ease;
+}
+
+.filter-button:hover {
+  background-color: #545b62;
 }
 
 .add-button {

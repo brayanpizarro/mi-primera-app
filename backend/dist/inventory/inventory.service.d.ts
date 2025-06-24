@@ -22,4 +22,5 @@ export declare class InventoryService {
     findByAttribute(key: string, value: string): Promise<Inventory[]>;
     getUniqueAttributeValues(key: string): Promise<string[]>;
     getUniqueAttributeKeys(): Promise<string[]>;
+    getTotalItems(): Promise<number>;
 }
