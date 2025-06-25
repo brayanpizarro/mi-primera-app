@@ -8,7 +8,6 @@ import {
   createInventoryItem,
   deleteInventoryItem,
   getInventoryStatuses,
-  getInventoryCount
 } from '../services/inventoryService';
 import EditModal from '../components/EditModal';
 import AddModal from '../components/AddModal';
@@ -19,10 +18,11 @@ const itemsPerPage = 10;
 
 const InventoryPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [nextItems, setNextItems] = useState<InventoryItem[] | null>(null); // estado intermedio para data nueva
   const [totalItems, setTotalItems] = useState(0);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [addingItem, setAddingItem] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<'price' | 'createdAt' | 'quantity'>('createdAt');
@@ -33,7 +33,18 @@ const InventoryPage = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [locations, setLocations] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
-  
+
+  // Carga inicial de ubicaciones y estados
+  useEffect(() => {
+    getInventoryLocations()
+      .then(res => setLocations(res.data))
+      .catch(err => console.error('Error al cargar ubicaciones:', err));
+    getInventoryStatuses()
+      .then(res => setStatuses(res.data))
+      .catch(err => console.error('Error al cargar estados:', err));
+  }, []);
+
+  // Cargar inventario cada vez que cambian filtros o página
   useEffect(() => {
     setLoading(true);
     getInventory(
@@ -46,30 +57,27 @@ const InventoryPage = () => {
       sortDirection.toUpperCase() as 'ASC' | 'DESC'
     )
       .then(res => {
-        setItems(res.data.data);
+        setNextItems(res.data.data); // guardamos la nueva data acá
         setTotalItems(res.data.total);
       })
       .catch(err => console.error('Error al cargar inventario:', err))
       .finally(() => setLoading(false));
   }, [currentPage, searchQuery, sortField, sortDirection, selectedLocation, selectedStatus]);
 
+  // Actualizamos items solo cuando nextItems cambia (data nueva lista)
   useEffect(() => {
-    setCurrentPage(1);
+    if (nextItems) {
+      setItems(nextItems);
+      setNextItems(null);
+    }
+  }, [nextItems]);
+
+  // Solo resetea página si no es 1, para evitar doble carga
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
   }, [searchQuery, sortField, sortDirection, selectedLocation, selectedStatus]);
-
-  useEffect(() => {
-    getInventoryLocations()
-      .then(res => setLocations(res.data))
-      .catch(err => console.error('Error al cargar ubicaciones:', err));
-  }, []);
-
-  useEffect(() => {
-    getInventoryStatuses()
-      .then((res) => {
-        setStatuses(res.data); 
-      })
-      .catch((err) => console.error('Error al cargar estados:', err));
-  }, []);
 
   const onEdit = (id: number) => {
     const item = items.find(i => i.id === id);
@@ -106,25 +114,23 @@ const InventoryPage = () => {
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    let cantidadNum: number = amount;
-
-    if (isNaN(cantidadNum) || cantidadNum <= 0 || cantidadNum > item.quantity) {
+    if (isNaN(amount) || amount <= 0 || amount > item.quantity) {
       alert('Cantidad inválida.');
       return;
     }
 
     try {
-      if (cantidadNum === item.quantity) {
+      if (amount === item.quantity) {
         await deleteInventoryItem(id);
         setItems(prev => prev.filter(p => p.id !== id));
         setMessage(`"${item.name}" eliminado completamente`);
       } else {
-        const nuevaCantidad = item.quantity - cantidadNum;
+        const nuevaCantidad = item.quantity - amount;
         await updateInventoryItem(id, { quantity: nuevaCantidad });
-        setItems(prev => prev.map(p =>
-          p.id === id ? { ...p, quantity: nuevaCantidad } : p
-        ));
-        setMessage(`Se eliminaron ${cantidadNum} unidades de "${item.name}". Quedan ${nuevaCantidad}`);
+        setItems(prev =>
+          prev.map(p => (p.id === id ? { ...p, quantity: nuevaCantidad } : p))
+        );
+        setMessage(`Se eliminaron ${amount} unidades de "${item.name}". Quedan ${nuevaCantidad}`);
       }
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
@@ -145,7 +151,7 @@ const InventoryPage = () => {
       sortDirection.toUpperCase() as 'ASC' | 'DESC'
     )
       .then(res => {
-        setItems(res.data.data);
+        setNextItems(res.data.data);
         setTotalItems(res.data.total);
       })
       .catch(err => console.error('Error al recargar inventario:', err))
@@ -176,7 +182,9 @@ const InventoryPage = () => {
           >
             <option value="">Todas las ubicaciones</option>
             {locations.map((loc) => (
-              <option key={loc} value={loc}>{loc}</option>
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
             ))}
           </select>
 
@@ -187,18 +195,19 @@ const InventoryPage = () => {
           >
             <option value="">Todos los estados</option>
             {statuses
-              .filter((status) => status.trim() !== '') 
+              .filter((status) => status.trim() !== '')
               .map((status) => (
                 <option key={status} value={status}>
                   {status}
                 </option>
-              ))
-            }
+              ))}
           </select>
 
           <select
             value={sortField}
-            onChange={(e) => setSortField(e.target.value as 'price' | 'createdAt' | 'quantity')}
+            onChange={(e) =>
+              setSortField(e.target.value as 'price' | 'createdAt' | 'quantity')
+            }
             className="filter-select"
           >
             <option value="createdAt">Ordenar por fecha</option>
@@ -220,86 +229,79 @@ const InventoryPage = () => {
           </button>
         </div>
 
-        {loading ? (
-          <div className="loading">Cargando inventario...</div>
-        ) : (
-          <>
-            <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+        {loading && <div className="loading-overlay">Cargando inventario...</div>}
 
-            <div className="pagination-controls">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                &laquo;
-              </button>
+        <InventoryTable items={items} onEdit={onEdit} onDelete={onDelete} onView={onView} />
 
-              {(() => {
-                const maxVisiblePages = 5;
-                const half = Math.floor(maxVisiblePages / 2);
-                let startPage = Math.max(1, currentPage - half);
-                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                if (endPage - startPage < maxVisiblePages - 1) {
-                  startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                }
+        <div className="pagination-controls">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            &laquo;
+          </button>
 
-                const pages = [];
-                for (let i = startPage; i <= endPage; i++) {
-                  pages.push(
-                    <button
-                      key={i}
-                      className={i === currentPage ? 'active-page' : ''}
-                      onClick={() => setCurrentPage(i)}
-                    >
-                      {i}
-                    </button>
-                  );
-                }
-                return pages;
-              })()}
+          {(() => {
+            const maxVisiblePages = 5;
+            const half = Math.floor(maxVisiblePages / 2);
+            let startPage = Math.max(1, currentPage - half);
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage < maxVisiblePages - 1) {
+              startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
 
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                &raquo;
-              </button>
-            </div>
+            const pages = [];
+            for (let i = startPage; i <= endPage; i++) {
+              pages.push(
+                <button
+                  key={i}
+                  className={i === currentPage ? 'active-page' : ''}
+                  onClick={() => setCurrentPage(i)}
+                >
+                  {i}
+                </button>
+              );
+            }
+            return pages;
+          })()}
 
-            {addingItem && (
-              <AddModal
-                onAdd={async (newItem) => {
-                  try {
-                    await createInventoryItem(newItem);
-                    setAddingItem(false);
-                    setMessage(`"${newItem.name}" agregado correctamente`);
-                    await reloadInventory();
-                    setTimeout(() => setMessage(''), 3000);
-                  } catch (err) {
-                    console.error('Error al agregar:', err);
-                    alert('No se pudo agregar el producto.');
-                  }
-                }}
-                onCancel={() => setAddingItem(false)}
-              />
-            )}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            &raquo;
+          </button>
+        </div>
 
-            {editingItem && (
-              <EditModal
-                item={editingItem}
-                onChange={handleEditChange}
-                onSave={handleSaveEdit}
-                onCancel={() => setEditingItem(null)}
-              />
-            )}
+        {addingItem && (
+          <AddModal
+            onAdd={async (newItem) => {
+              try {
+                await createInventoryItem(newItem);
+                setAddingItem(false);
+                setMessage(`"${newItem.name}" agregado correctamente`);
+                await reloadInventory();
+                setTimeout(() => setMessage(''), 3000);
+              } catch (err) {
+                console.error('Error al agregar:', err);
+                alert('No se pudo agregar el producto.');
+              }
+            }}
+            onCancel={() => setAddingItem(false)}
+          />
+        )}
 
-            {viewingItem && (
-              <ViewModal
-                item={viewingItem}
-                onClose={() => setViewingItem(null)}
-              />
-            )}
-          </>
+        {editingItem && (
+          <EditModal
+            item={editingItem}
+            onChange={handleEditChange}
+            onSave={handleSaveEdit}
+            onCancel={() => setEditingItem(null)}
+          />
+        )}
+
+        {viewingItem && (
+          <ViewModal item={viewingItem} onClose={() => setViewingItem(null)} />
         )}
       </div>
     </div>

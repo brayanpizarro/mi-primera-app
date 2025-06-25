@@ -22,7 +22,6 @@ export declare class InventoryController {
         page: number;
         totalPages: number;
     }>;
-    findOne(id: string): Promise<import("./entities/inventory.entity").Inventory | null>;
     update(id: string, dto: UpdateInventoryDto): Promise<import("./entities/inventory.entity").Inventory | null>;
     remove(id: string): Promise<import("./entities/inventory.entity").Inventory>;
     getCount(): Promise<{
@@ -32,4 +31,5 @@ export declare class InventoryController {
     getStatuses(): Promise<string[]>;
     getAttributeKeys(): Promise<string[]>;
     findByAttribute(key: string, value: string): Promise<string[] | import("./entities/inventory.entity").Inventory[]>;
+    findOne(id: string): Promise<import("./entities/inventory.entity").Inventory | null>;
 }

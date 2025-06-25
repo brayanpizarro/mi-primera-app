@@ -42,7 +42,7 @@ export class InventoryService {
     sort: string = 'createdAt',
     direction: 'ASC' | 'DESC' = 'DESC',
   ) {
-    console.log('🔍 Buscando inventario con parámetros:', { search, page, limit, location, status, sort, direction });
+    
     
     const queryBuilder = this.inventoryRepo
       .createQueryBuilder('inventory')
@@ -74,7 +74,7 @@ export class InventoryService {
     // Ejecutar la consulta
     const [data, total] = await queryBuilder.getManyAndCount();
     
-    console.log('📊 Resultados encontrados:', { total, dataLength: data.length });
+    
 
     // Asegurar que los atributos estén cargados correctamente
     const itemsWithAttributes = await Promise.all(
@@ -95,19 +95,23 @@ export class InventoryService {
   }
 
   async findOne(id: number) {
+    if (isNaN(id)) {
+      throw new Error(`El ID proporcionado no es un número válido: ${id}`);
+    }
+
     return this.inventoryRepo.findOne({
       where: { id },
-      relations: ['attributes']
+      relations: ['attributes'],
     });
   }
-
   async update(id: number, dto: UpdateInventoryDto) {
     const { attributes, ...inventoryData } = dto;
     const item = await this.inventoryRepo.preload({ id, ...inventoryData });
     if (!item) throw new NotFoundException(`Item #${id} not found`);
     
     const savedItem = await this.inventoryRepo.save(item);
-
+    
+    
     if (attributes) {
       // Remove existing attributes
       await this.attributeRepo.delete({ inventory: { id } });
@@ -140,6 +144,7 @@ export class InventoryService {
       .where('inventory.location IS NOT NULL')
       .getRawMany();
 
+    
     return result.map(row => row.location);
   }
 
@@ -150,8 +155,10 @@ export class InventoryService {
       .where('inventory.status IS NOT NULL')
       .getRawMany();
 
+    
     return result.map(row => row.status);
   }
+
 
   async findByAttribute(key: string, value: string) {
     return this.inventoryRepo

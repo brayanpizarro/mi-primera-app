@@ -51,9 +51,6 @@ let InventoryController = class InventoryController {
         const limitNum = parseInt(limit, 10);
         return this.inventoryService.findAllPaginated(filter, pageNum, limitNum, location, status, sort, direction);
     }
-    findOne(id) {
-        return this.inventoryService.findOne(+id);
-    }
     update(id, dto) {
         return this.inventoryService.update(+id, dto);
     }
@@ -78,6 +75,9 @@ let InventoryController = class InventoryController {
             return this.inventoryService.findByAttribute(key, value);
         }
         return this.inventoryService.getUniqueAttributeValues(key);
+    }
+    findOne(id) {
+        return this.inventoryService.findOne(+id);
     }
 };
 exports.InventoryController = InventoryController;
@@ -111,15 +111,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object, String, String, Object, String]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], InventoryController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
@@ -181,6 +172,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findByAttribute", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "findOne", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])

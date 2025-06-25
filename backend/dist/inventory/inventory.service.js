@@ -39,7 +39,6 @@ let InventoryService = class InventoryService {
         return this.findOne(savedItem.id);
     }
     async findAllPaginated(search, page, limit, location, status, sort = 'createdAt', direction = 'DESC') {
-        console.log('🔍 Buscando inventario con parámetros:', { search, page, limit, location, status, sort, direction });
         const queryBuilder = this.inventoryRepo
             .createQueryBuilder('inventory')
             .leftJoinAndSelect('inventory.attributes', 'attributes');
@@ -56,7 +55,6 @@ let InventoryService = class InventoryService {
         queryBuilder.orderBy(`inventory.${sort}`, direction);
         queryBuilder.skip((page - 1) * limit).take(limit);
         const [data, total] = await queryBuilder.getManyAndCount();
-        console.log('📊 Resultados encontrados:', { total, dataLength: data.length });
         const itemsWithAttributes = await Promise.all(data.map(async (item) => {
             if (!item.attributes) {
                 item.attributes = [];
@@ -71,9 +69,12 @@ let InventoryService = class InventoryService {
         };
     }
     async findOne(id) {
+        if (isNaN(id)) {
+            throw new Error(`El ID proporcionado no es un número válido: ${id}`);
+        }
         return this.inventoryRepo.findOne({
             where: { id },
-            relations: ['attributes']
+            relations: ['attributes'],
         });
     }
     async update(id, dto) {

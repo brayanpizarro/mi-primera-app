@@ -85,18 +85,7 @@ export class InventoryController {
     );
   }
 
-  /**
-   * Obtiene un item específico por ID
-   * @param id - ID del item a buscar
-   * @returns Item encontrado
-   * @roles ADMIN, USER
-   */
-  @Get(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER)
-  findOne(@Param('id') id: string) {
-    return this.inventoryService.findOne(+id);
-  }
+
 
   /**
    * Actualiza un item existente
@@ -165,5 +154,18 @@ export class InventoryController {
       return this.inventoryService.findByAttribute(key, value);
     }
     return this.inventoryService.getUniqueAttributeValues(key);
+  }
+
+    /**
+   * Obtiene un item específico por ID
+   * @param id - ID del item a buscar
+   * @returns Item encontrado
+   * @roles ADMIN, USER
+   */
+  @Get(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  findOne(@Param('id') id: string) {
+    return this.inventoryService.findOne(+id);
   }
 }
