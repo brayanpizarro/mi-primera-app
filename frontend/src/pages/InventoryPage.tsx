@@ -89,22 +89,36 @@ const InventoryPage = () => {
     setEditingItem(prev => (prev ? { ...prev, [field]: value } : prev));
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingItem) return;
+const handleSaveEdit = async () => {
+  if (!editingItem) return;
 
-    const { id, createdAt, ...updateData } = editingItem;
+  const { id, createdAt, ...rest } = editingItem;
 
-    try {
-      const res = await updateInventoryItem(id, updateData);
-      setItems(prev => prev.map(p => (p.id === id ? res.data : p)));
-      setEditingItem(null);
-      setMessage(`El objeto "${res.data.name}" ha sido actualizado correctamente`);
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      console.error('Error al editar:', err);
-      alert('No se pudo actualizar el producto.');
-    }
-  };
+  // Limpiar atributos: eliminar id y campos vacíos
+  const cleanedAttributes = (rest.attributes || [])
+    .filter(attr => attr.key?.trim() && attr.value?.trim())
+    .map(({ key, value }) => ({ key, value }));
+
+  const isValidImage = rest.imageUrl?.startsWith('http');
+
+  const updateData = {
+    ...rest,
+    attributes: cleanedAttributes,
+    imageUrl: isValidImage ? rest.imageUrl : undefined,
+  } as any;
+
+  try {
+    console.log('Enviando a backend:', updateData);
+    const res = await updateInventoryItem(id, updateData);
+    setItems(prev => prev.map(p => (p.id === id ? res.data : p)));
+    setEditingItem(null);
+    setMessage(`El objeto "${res.data.name}" ha sido actualizado correctamente`);
+    setTimeout(() => setMessage(''), 3000);
+  } catch (err) {
+    console.error('Error al editar:', err);
+    alert('No se pudo actualizar el producto.');
+  }
+};
 
   const onView = (id: number) => {
     const item = items.find(i => i.id === id);

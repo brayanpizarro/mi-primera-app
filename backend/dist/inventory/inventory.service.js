@@ -30,9 +30,10 @@ let InventoryService = class InventoryService {
         const newItem = this.inventoryRepo.create(inventoryData);
         const savedItem = await this.inventoryRepo.save(newItem);
         if (attributes && attributes.length > 0) {
-            const attributeEntities = attributes.map(attr => this.attributeRepo.create({
-                ...attr,
-                inventory: savedItem
+            const attributeEntities = attributes.map(({ key, value }) => this.attributeRepo.create({
+                key,
+                value,
+                inventory: savedItem,
             }));
             await this.attributeRepo.save(attributeEntities);
         }
@@ -86,9 +87,10 @@ let InventoryService = class InventoryService {
         if (attributes) {
             await this.attributeRepo.delete({ inventory: { id } });
             if (attributes.length > 0) {
-                const attributeEntities = attributes.map(attr => this.attributeRepo.create({
-                    ...attr,
-                    inventory: savedItem
+                const attributeEntities = attributes.map(({ key, value }) => this.attributeRepo.create({
+                    key,
+                    value,
+                    inventory: savedItem,
                 }));
                 await this.attributeRepo.save(attributeEntities);
             }
@@ -107,7 +109,7 @@ let InventoryService = class InventoryService {
             .select('DISTINCT inventory.location', 'location')
             .where('inventory.location IS NOT NULL')
             .getRawMany();
-        return result.map(row => row.location);
+        return result.map((row) => row.location);
     }
     async getUniqueStatuses() {
         const result = await this.inventoryRepo
@@ -115,7 +117,7 @@ let InventoryService = class InventoryService {
             .select('DISTINCT inventory.status', 'status')
             .where('inventory.status IS NOT NULL')
             .getRawMany();
-        return result.map(row => row.status);
+        return result.map((row) => row.status);
     }
     async findByAttribute(key, value) {
         return this.inventoryRepo
@@ -131,14 +133,14 @@ let InventoryService = class InventoryService {
             .select('DISTINCT attribute.value', 'value')
             .where('attribute.key = :key', { key })
             .getRawMany();
-        return result.map(row => row.value);
+        return result.map((row) => row.value);
     }
     async getUniqueAttributeKeys() {
         const result = await this.attributeRepo
             .createQueryBuilder('attribute')
             .select('DISTINCT attribute.key', 'key')
             .getRawMany();
-        return result.map(row => row.key);
+        return result.map((row) => row.key);
     }
     async getTotalItems() {
         return this.inventoryRepo.count();

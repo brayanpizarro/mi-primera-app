@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, FindOptionsWhere, ILike } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Inventory } from './entities/inventory.entity';
 import { InventoryAttribute } from './entities/inventory-attribute.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
@@ -21,11 +21,12 @@ export class InventoryService {
     const savedItem = await this.inventoryRepo.save(newItem);
 
     if (attributes && attributes.length > 0) {
-      const attributeEntities = attributes.map(attr => 
+      const attributeEntities = attributes.map(({ key, value }) =>
         this.attributeRepo.create({
-          ...attr,
-          inventory: savedItem
-        })
+          key,
+          value,
+          inventory: savedItem,
+        }),
       );
       await this.attributeRepo.save(attributeEntities);
     }
@@ -42,18 +43,15 @@ export class InventoryService {
     sort: string = 'createdAt',
     direction: 'ASC' | 'DESC' = 'DESC',
   ) {
-    
-    
     const queryBuilder = this.inventoryRepo
       .createQueryBuilder('inventory')
       .leftJoinAndSelect('inventory.attributes', 'attributes');
 
-    // Búsqueda mejorada que incluye nombre, descripción, valores de atributos y claves de atributos
     if (search && search.trim() !== '') {
       const searchTerm = `%${search.trim()}%`;
       queryBuilder.where(
         '(inventory.name ILIKE :search OR inventory.description ILIKE :search OR attributes.value ILIKE :search OR attributes.key ILIKE :search)',
-        { search: searchTerm }
+        { search: searchTerm },
       );
     }
 
@@ -65,25 +63,18 @@ export class InventoryService {
       queryBuilder.andWhere('inventory.status = :status', { status });
     }
 
-    // Aplicar ordenamiento
     queryBuilder.orderBy(`inventory.${sort}`, direction);
-
-    // Aplicar paginación
     queryBuilder.skip((page - 1) * limit).take(limit);
 
-    // Ejecutar la consulta
     const [data, total] = await queryBuilder.getManyAndCount();
-    
-    
 
-    // Asegurar que los atributos estén cargados correctamente
     const itemsWithAttributes = await Promise.all(
       data.map(async (item) => {
         if (!item.attributes) {
           item.attributes = [];
         }
         return item;
-      })
+      }),
     );
 
     return {
@@ -104,25 +95,24 @@ export class InventoryService {
       relations: ['attributes'],
     });
   }
+
   async update(id: number, dto: UpdateInventoryDto) {
     const { attributes, ...inventoryData } = dto;
     const item = await this.inventoryRepo.preload({ id, ...inventoryData });
     if (!item) throw new NotFoundException(`Item #${id} not found`);
-    
+
     const savedItem = await this.inventoryRepo.save(item);
-    
-    
+
     if (attributes) {
-      // Remove existing attributes
       await this.attributeRepo.delete({ inventory: { id } });
-      
-      // Create new attributes
+
       if (attributes.length > 0) {
-        const attributeEntities = attributes.map(attr => 
+        const attributeEntities = attributes.map(({ key, value }) =>
           this.attributeRepo.create({
-            ...attr,
-            inventory: savedItem
-          })
+            key,
+            value,
+            inventory: savedItem,
+          }),
         );
         await this.attributeRepo.save(attributeEntities);
       }
@@ -144,8 +134,7 @@ export class InventoryService {
       .where('inventory.location IS NOT NULL')
       .getRawMany();
 
-    
-    return result.map(row => row.location);
+    return result.map((row) => row.location);
   }
 
   async getUniqueStatuses(): Promise<string[]> {
@@ -155,10 +144,8 @@ export class InventoryService {
       .where('inventory.status IS NOT NULL')
       .getRawMany();
 
-    
-    return result.map(row => row.status);
+    return result.map((row) => row.status);
   }
-
 
   async findByAttribute(key: string, value: string) {
     return this.inventoryRepo
@@ -176,7 +163,7 @@ export class InventoryService {
       .where('attribute.key = :key', { key })
       .getRawMany();
 
-    return result.map(row => row.value);
+    return result.map((row) => row.value);
   }
 
   async getUniqueAttributeKeys(): Promise<string[]> {
@@ -185,7 +172,7 @@ export class InventoryService {
       .select('DISTINCT attribute.key', 'key')
       .getRawMany();
 
-    return result.map(row => row.key);
+    return result.map((row) => row.key);
   }
 
   async getTotalItems(): Promise<number> {
