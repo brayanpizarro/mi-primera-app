@@ -29,7 +29,10 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: pnpm run dev
+    working_dir: /app
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+    command: pnpm run dev -- --host
     depends_on:
       - backend
 
