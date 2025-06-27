@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InventoryItem } from '../types/InventoryItem';
 import './ViewModal.css';
 
@@ -8,18 +8,33 @@ interface Props {
 }
 
 const ViewModal: React.FC<Props> = ({ item, onClose }) => {
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    setIsVisible(true); 
+
     return () => {
       document.body.style.overflow = '';
     };
   }, []);
 
+  const handleClose = () => {
+    setIsVisible(false); 
+    setTimeout(() => {
+      onClose();
+    }, 300); 
+  };
+
   return (
-    <div className="view-modal-overlay" onClick={onClose}>
-      <div className="view-modal-content" onClick={e => e.stopPropagation()}>
-        <button className="view-close-btn" onClick={onClose}>×</button>
+    <div className="view-modal-overlay" onClick={handleClose}>
+      <div
+        className={`view-modal-content ${isVisible ? 'show' : 'hide'}`}
+        onClick={e => e.stopPropagation()}
+      >
+        <button className="view-close-btn" onClick={handleClose}>
+          ×
+        </button>
 
         <h2>{item.name}</h2>
         {item.imageUrl && (
