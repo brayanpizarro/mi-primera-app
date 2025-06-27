@@ -5,11 +5,12 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 0.5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Myriad Pro', sans-serif;
+  
 }
 
 .inventory-table th {
-  background-color: #007bff;
+  background-color: #005EB8;
   padding: 1rem;
   text-align: center;
   font-weight: bold;
@@ -22,7 +23,8 @@
   padding: 1rem;
   text-align: center;
   border-bottom: 1px solid #eee;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  font-size: 1.1rem;
+
 }
 
 .inventory-table tbody tr:hover td {
@@ -178,12 +180,6 @@
   background: linear-gradient(to right, #1a365d, #2b6cb0); /* Oscuro al hover */
 }
 
-.custom-attr-icon {
-  color: #57cfff; 
-  font-size: 1.2em;
-  margin-left: 6px;
-  user-select: none;
-}
 
 .inventory-table-background {
   background: linear-gradient(135deg, #e3e9f7 0%, #f7fafd 100%);
@@ -231,4 +227,17 @@
   color: #999;
   font-style: italic;
   font-size: 0.85rem;
+}
+
+.cell-with-icon {
+  position: relative;
+  vertical-align: middle;
+}
+
+.custom-attr-icon-top {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #007A33;
+  font-size: 1.3rem;
 }

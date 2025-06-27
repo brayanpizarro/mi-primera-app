@@ -65,71 +65,68 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
 
               {/* ───── ACCIONES ───── */}
               <td
-                className="inventory-action-cell"
-                onClick={e => e.stopPropagation()}
-              >
-                {/* Icono que indica atributos */}
-                {item.attributes && item.attributes.length > 0 && (
-                  <div className="custom-attr-icon" title="Tiene atributos adicionales">
-                    <FaTag />
-                  </div>
-                )}
+                  className="inventory-action-cell cell-with-icon"
+                  onClick={e => e.stopPropagation()}
+                >
+                  {item.attributes && item.attributes.length > 0 && (
+                    <FaTag className="custom-attr-icon-top" title="Tiene atributos adicionales" />
+                  )}
 
-                {deleteRow !== item.id ? (
-                  <>
-                    <button
-                      className="inventory-icon-button"
-                      onClick={() => onEdit(item.id)}
-                    >
-                      <FaEdit />
-                    </button>
-
-                    <button
-                      className="inventory-icon-button"
-                      onClick={() => {
-                        setDeleteRow(item.id);
-                        setDeleteQty(1);
-                      }}
-                    >
-                      <FaTrash />
-                    </button>
-                  </>
-                ) : (
-                  <div className="inventory-delete-mode">
-                    <input
-                      type="number"
-                      min={1}
-                      max={item.quantity}
-                      step={1}
-                      value={deleteQty}
-                      className="inventory-qty-input"
-                      onChange={e => {
-                        const v = Number(e.target.value);
-                        if (!Number.isNaN(v))
-                          setDeleteQty(Math.max(1, Math.min(item.quantity, v)));
-                      }}
-                    />
-
-                    <div className="inventory-delete-buttons">
+                  {deleteRow !== item.id ? (
+                    <>
                       <button
-                        className="inventory-confirm-btn"
+                        className="inventory-icon-button"
+                        onClick={() => onEdit(item.id)}
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        className="inventory-icon-button"
                         onClick={() => {
-                          onDelete(item.id, deleteQty);
-                          setDeleteRow(-1);
+                          setDeleteRow(item.id);
+                          setDeleteQty(1);
                         }}
                       >
-                        Eliminar
+                        <FaTrash />
                       </button>
-                      <button
-                        className="inventory-cancel-btn"
-                        onClick={() => setDeleteRow(-1)}
-                      >
-                        Cancelar
-                      </button>
+                    </>
+                  ) : (
+                    <div className="inventory-delete-mode">
+                      <input
+                        type="number"
+                        min={1}
+                        max={item.quantity}
+                        step={1}
+                        value={deleteQty}
+                        className="inventory-qty-input"
+                        onChange={e => {
+                          const v = Number(e.target.value);
+                          if (!Number.isNaN(v))
+                            setDeleteQty(Math.max(1, Math.min(item.quantity, v)));
+                        }}
+                      />
+
+                      <div className="inventory-delete-buttons">
+                        <button
+                          className="inventory-confirm-btn"
+                          onClick={() => {
+                            onDelete(item.id, deleteQty);
+                            setDeleteRow(-1);
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                        <button
+                          className="inventory-cancel-btn"
+                          onClick={() => setDeleteRow(-1)}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </td>
+                  )}
+                </td>
             </tr>
           ))}
         </tbody>

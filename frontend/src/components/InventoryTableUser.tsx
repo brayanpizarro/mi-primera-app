@@ -1,8 +1,9 @@
+// src/components/InventoryTableUser.tsx
 import React, { useState } from 'react';
 import { FaTag } from 'react-icons/fa';
 import { InventoryItem } from '../types/InventoryItem';
-import './InventoryTableUser.css';
 import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png';
+import './InventoryTable.css'; 
 
 interface Props {
   items: InventoryItem[];
@@ -12,28 +13,22 @@ interface Props {
 const InventoryTableUser: React.FC<Props> = ({ items, onView }) => {
   const [modalImage, setModalImage] = useState<string | null>(null);
 
-  const openModal = (imageUrl: string) => {
-    setModalImage(imageUrl);
-  };
-
-  const closeModal = () => {
-    setModalImage(null);
-  };
-
   return (
-    <>
-      <table className="centered-table">
+    <div className="inventory-table-background">
+      <table className="inventory-table">
         <thead>
           <tr>
-            <th></th>
+            <th />
             <th>Nombre</th>
             <th>Descripción</th>
             <th>Ubicación</th>
             <th>Precio</th>
             <th>Cantidad</th>
+            <th>Estado</th>
             <th>Fecha de ingreso</th>
           </tr>
         </thead>
+
         <tbody>
           {items.map(item => (
             <tr
@@ -41,45 +36,54 @@ const InventoryTableUser: React.FC<Props> = ({ items, onView }) => {
               className="clickable-row"
               onClick={() => onView(item.id)}
             >
+              {/* Imagen */}
               <td>
                 <img
                   src={item.imageUrl || imagenPredeterminada}
                   alt={item.name}
-                  className="inventory-image"
+                  className="inventory-item-image"
                   onClick={(e) => {
-                    e.stopPropagation(); 
-                    openModal(item.imageUrl || imagenPredeterminada);
+                    e.stopPropagation();
+                    setModalImage(item.imageUrl || imagenPredeterminada);
                   }}
                   style={{ cursor: 'pointer' }}
                 />
               </td>
-              <td style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                {item.name}
-              </td>
+
+              {/* Detalles */}
+              <td>{item.name}</td>
               <td>{item.description || '-'}</td>
               <td>{item.location}</td>
               <td>${item.price.toLocaleString('es-CL')}</td>
               <td>{item.quantity}</td>
-              <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}
-                
-                  {item.customAttributes && Object.keys(item.customAttributes).length > 0 && (
-                  <FaTag className="custom-attr-icon-user" title="Tiene atributos personalizados" />
-                )}
-              </td>
+              <td>{item.status}</td>
+<td className="cell-with-icon">
+  {new Date(item.createdAt).toLocaleDateString('es-CL')}
+
+  {item.attributes && item.attributes.length > 0 && (
+    <FaTag className="custom-attr-icon-top" title="Tiene atributos adicionales" />
+  )}
+</td>
             </tr>
           ))}
         </tbody>
       </table>
 
+      {/* Modal para imagen */}
       {modalImage && (
-        <div className="modal-overlay" onClick={closeModal}>
+        <div className="inventory-modal-overlay" onClick={() => setModalImage(null)}>
           <div className="inventory-modal-content" onClick={(e) => e.stopPropagation()}>
             <img src={modalImage} alt="Vista ampliada" />
-            <button className="modal-close-button" onClick={closeModal}>×</button>
+            <button
+              className="inventory-modal-close-button"
+              onClick={() => setModalImage(null)}
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

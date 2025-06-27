@@ -14,6 +14,7 @@ import AddModal from '../components/AddModal';
 import ViewModal from '../components/ViewModal';
 import './InventoryPage.css';
 
+
 const itemsPerPage = 10;
 
 const InventoryPage = () => {
@@ -162,8 +163,8 @@ const InventoryPage = () => {
 
   return (
     <div className="inventory-page-background">
-      <div className="inventory-container">
-        <h1>Inventario</h1>
+      <div className="inventory-container"> 
+    <h1>Inventario</h1>
         {message && <div className="success-message">{message}</div>}
 
         <div className="controls">
