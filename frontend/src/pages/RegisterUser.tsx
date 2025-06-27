@@ -70,10 +70,8 @@ const RegisterUser = () => {
         rut: formattedRut
       });
 
-      // Redirigir al login después de registro exitoso
-      navigate('/login', {
-        state: { registrationSuccess: true }
-      });
+      // Redirigir al inventario después de registro exitoso
+      navigate('/inventory');
     } catch (err: any) {
       // Manejo mejorado de errores
       if (err.response) {
