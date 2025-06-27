@@ -27,23 +27,18 @@ const Navbar = () => {
       <div className="navbar-brand">
         <span>StockMind UCN</span>
       </div>
-      <div className="navbar-menu">        {isAdmin ? (
-          <>
-            <Link to="/inventory" className="navbar-item">
-                Ver Inventario
-            </Link>
-            <Link to="/register" className="navbar-item">
-              Registrar Usuario
-            </Link>
-            <Link to="/editProfile" className="navbar-item">
-              Editar Perfil
-            </Link>
-          </>
-        ) : (
-          <Link to="/inventoryUser" className="navbar-item">
-            Ver Inventario
+      <div className="navbar-menu">
+        <Link to={isAdmin ? "/inventory" : "/inventoryUser"} className="navbar-item">
+          Ver Inventario
+        </Link>
+        {isAdmin && (
+          <Link to="/register" className="navbar-item">
+            Registrar Usuario
           </Link>
         )}
+        <Link to="/editProfile" className="navbar-item">
+          Editar Perfil
+        </Link>
       </div>
       <div className="navbar-end">
         <div className="navbar-user">
