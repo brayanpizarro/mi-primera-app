@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './EditModal.css';
-import { InventoryItem, InventoryAttribute } from '../types/InventoryItem';
+import { InventoryItem} from '../types/InventoryItem';
 
 interface Props {
   item: InventoryItem;
