@@ -80,9 +80,10 @@ const InventoryPageUser = () => {
 
 
   return (
+  <div className="inventory-page-background">
     <div className="inventory-container">
       <div className="header-container">
-        <h1>INVENTARIO</h1>
+        <h1>Inventario</h1>
         
       </div>
 
@@ -192,6 +193,7 @@ const InventoryPageUser = () => {
 
         </>
       )}
+    </div>
     </div>
   );
 };
