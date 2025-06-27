@@ -1,16 +1,64 @@
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes viewFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Overlay */
 .view-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(33, 37, 41, 0.6); 
+  background: rgba(33, 37, 41, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  backdrop-filter: blur(4px); 
-  
+  backdrop-filter: blur(4px);
+  opacity: 1;
+  animation: overlayFadeIn 0.3s ease forwards;
 }
 
+.view-modal-overlay.hide {
+  animation: overlayFadeOut 0.3s ease forwards;
+  pointer-events: none;
+}
+
+/* Modal content */
 .view-modal-content {
   position: relative;
   background: #ffffff;
@@ -20,17 +68,34 @@
   width: 95%;
   max-height: 90vh;
   overflow-y: auto;
+
+  opacity: 0;
+  transform: translateY(-15px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Estado visible */
+.view-modal-content.show {
+  opacity: 1;
+  transform: translateY(0);
+  animation: viewFadeIn 0.3s ease forwards;
+}
+
+/* Estado oculto */
+.view-modal-content.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: viewFadeOut 0.3s ease forwards;
 }
 
 .view-image {
   max-width: 100%;
   border-radius: 6px;
   margin-bottom: 1rem;
-  
 }
 
 .view-close-btn {
-position: absolute;
+  position: absolute;
   top: 15px;
   right: 15px;
   background: #005EB8;
@@ -44,11 +109,12 @@ position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  
 }
-.view-close-btn:hover{
-    background: #024d8a
+
+.view-close-btn:hover {
+  background: #024d8a;
 }
-h2{
-    text-align: center;
+
+h2 {
+  text-align: center;
 }
