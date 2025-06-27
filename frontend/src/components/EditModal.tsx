@@ -15,8 +15,8 @@ const UPLOAD_PRESET  = 'InventarioECIN';
 const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';   // 🔒
-    return () => { document.body.style.overflow = ''; }; // 🔓 al desmontar
+    document.body.style.overflow = 'hidden';   
+    return () => { document.body.style.overflow = ''; }; 
   }, []);
 
   const [uploading, setUploading] = useState(false);
