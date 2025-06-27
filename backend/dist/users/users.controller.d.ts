@@ -29,4 +29,14 @@ export declare class UsersController {
         deletedAt: Date;
     }>;
     removeByRut(rut: string): Promise<import("typeorm").UpdateResult>;
+    updateByEmail(email: string, updateUserDto: UpdateUserDto): Promise<{
+        id: number;
+        name: string;
+        rut: string;
+        email: string;
+        role: import("./entities/user-role.enum").UserRole;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date;
+    }>;
 }

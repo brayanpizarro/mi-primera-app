@@ -101,6 +101,57 @@ export class UsersService {
     return result;
   }
 
+  async updateByEmail(email: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con email ${email} no encontrado`);
+    }
+
+    if (updateUserDto.name) {
+      user.name = updateUserDto.name;
+    }
+
+    // Permitir actualizar RUT para usuarios de Google
+    if (updateUserDto.rut && updateUserDto.rut !== '0-0') {
+      // Verificar que el RUT no esté en uso por otro usuario
+      const existingUser = await this.userRepository.findOne({
+        where: { rut: updateUserDto.rut },
+      });
+      if (existingUser && existingUser.email !== email) {
+        throw new BadRequestException('El RUT ya está registrado por otro usuario');
+      }
+      user.rut = updateUserDto.rut;
+    }
+
+    // Permitir a usuarios Google cambiar contraseña sin la actual
+    if (updateUserDto.newPassword) {
+      // Si el usuario es Google (rut original era '0-0' o email termina en @gmail.com)
+      if (user.rut === '0-0' || user.email.endsWith('@gmail.com')) {
+        user.password = await bcrypt.hash(updateUserDto.newPassword, 10);
+      } else {
+        // Usuario normal: requiere contraseña actual
+        if (!updateUserDto.currentPassword) {
+          throw new BadRequestException('Se requiere la contraseña actual para cambiarla');
+        }
+        const isPasswordValid = await bcrypt.compare(
+          updateUserDto.currentPassword,
+          user.password,
+        );
+        if (!isPasswordValid) {
+          throw new BadRequestException('Contraseña actual incorrecta');
+        }
+        user.password = await bcrypt.hash(updateUserDto.newPassword, 10);
+      }
+    }
+
+    const updatedUser = await this.userRepository.save(user);
+    const { password, ...result } = updatedUser;
+    return result;
+  }
+
   async remove(id: number) {
     return await this.userRepository.softDelete(id);
   }
