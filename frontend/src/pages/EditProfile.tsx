@@ -5,7 +5,7 @@ import { UserContext } from '../context/UserContext';
 import './Register.css';
 
 const EditProfile = () => {
-  const { user, login } = useContext(UserContext);
+  const {login } = useContext(UserContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -15,9 +15,9 @@ const EditProfile = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Verificar autenticación al cargar el componente
+
   useEffect(() => {
-    // Obtener datos de localStorage
+ 
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
 
@@ -68,7 +68,7 @@ const EditProfile = () => {
       }
 
       const parsedUser = JSON.parse(storedUser);
-      console.log('Enviando actualización para:', parsedUser); // Debug
+      console.log('Enviando actualización para:', parsedUser); 
 
       const updateData = {
         ...(formData.name && { name: formData.name }),
@@ -87,7 +87,7 @@ const EditProfile = () => {
         }
       );
 
-      console.log('Respuesta del servidor:', response.data); // Debug
+      console.log('Respuesta del servidor:', response.data); 
 
       if (response.data) {
         const updatedUser = { ...parsedUser, ...response.data };

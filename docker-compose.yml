@@ -1,6 +1,8 @@
+version: '3.8'
+
 services:
   backend:
-    build: .
+    build: ./backend
     container_name: nest_backend
     ports:
       - "3000:3000"
@@ -14,9 +16,25 @@ services:
       DB_PASSWORD: postgres
       DB_NAME: mi_basedatos
     volumes:
-      - .:/app
+      - ./backend:/app
       - /app/node_modules
     command: pnpm run start:dev
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vite_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+    command: pnpm run dev -- --host
+    depends_on:
+      - backend
 
   postgres:
     image: postgres:15

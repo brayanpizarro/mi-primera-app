@@ -12,7 +12,7 @@ const RegisterUser = () => {
     rut: '',
     email: '',
     password: '',
-    role: 'user' // Valor por defecto según el enum UserRole (ahora en minúscula)
+    role: 'user' 
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -61,19 +61,19 @@ const RegisterUser = () => {
     setError('');
 
     try {
-      // Formatear el RUT antes de enviarlo
+  
       const formattedRut = formatRut(formData.rut);
       
-      // Enviar datos al backend con el prefijo /api/v1
+      
       await axios.post('http://localhost:3000/api/v1/auth/register', {
         ...formData,
         rut: formattedRut
       });
 
-      // Redirigir al inventario después de registro exitoso
+      
       navigate('/inventory');
     } catch (err: any) {
-      // Manejo mejorado de errores
+      
       if (err.response) {
         if (err.response.status === 400) {
           setError('El usuario ya existe');
@@ -91,7 +91,7 @@ const RegisterUser = () => {
 
   return (
     <div className="register-wrapper">
-      {/* Contenedor de logos agregado */}
+     
       <div className="logos-container">
         <img src={ucnLogo} alt="Universidad Católica del Norte" className="institution-logo" />
         <img src={eicLogo} alt="Escuela de Ingeniería y Ciencias" className="institution-logo" />

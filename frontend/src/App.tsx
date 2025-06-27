@@ -7,7 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { UserProvider } from './context/UserContext';
 import Navbar from './components/Navbar';
 import EditProfile from './pages/EditProfile';
-import UsersTable from './components/UsersTable';
+import UsersTable from './pages/UsersTable';
 
 
 function AppWrapper() {

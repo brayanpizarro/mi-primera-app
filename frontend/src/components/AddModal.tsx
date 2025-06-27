@@ -145,7 +145,7 @@ const AddModal: React.FC<Props> = ({ onAdd, onCancel }) => {
 
   const handleClose = () => {
     setShow(false);
-    setTimeout(onCancel, 300); // coincide con la animación CSS
+    setTimeout(onCancel, 300); 
   };
 
   return (

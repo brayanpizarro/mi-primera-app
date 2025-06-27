@@ -8,11 +8,9 @@ interface ProtectedRouteProps {
 
 interface User {
   role: 'user' | 'admin';
-  // otras propiedades del usuario si las hay
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  // Mejor manejo del usuario en localStorage
   let user: User | null = null;
   try {
     const userData = localStorage.getItem('user');
@@ -25,12 +23,12 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const token = localStorage.getItem('token');
 
   if (!token || !user) {
-    // Usuario no autenticado
+
     return <Navigate to="/login" replace />;
   }
 
   if (requiredRole && user.role !== requiredRole) {
-    // Usuario no tiene el rol requerido
+
     return <Navigate to="/unauthorized" replace />;
   }
  

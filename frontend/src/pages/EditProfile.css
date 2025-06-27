@@ -1,4 +1,3 @@
-/* src/pages/Register.css */
 .register-wrapper {
   min-height: 100vh;
   display: flex;
@@ -90,7 +89,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Validación visual */
+
 .form-input:invalid:not(:placeholder-shown) {
   border-color: #f87171;
 }
@@ -99,7 +98,7 @@
   border-color: #34d399;
 }
 
-/* Efecto de vidrio para móviles */
+
 @media (max-width: 480px) {
   .register-container {
     padding: 1.8rem;

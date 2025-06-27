@@ -11,9 +11,9 @@
 
   z-index: 1000;
 
-  overflow: auto; /* para que el fondo tenga scroll si hace falta */
+  overflow: auto; 
 
-  padding: 0; /* elimina padding para evitar desplazamientos */
+  padding: 0; 
 
   opacity: 0;
   pointer-events: none;
@@ -26,15 +26,10 @@
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
-
   max-height: 80%;
   overflow-y: auto;
-
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-
-  /* Animación: si quieres centrar sin que se mueva, elimina la translateY */
-  /* transform: translateY(-20px); */
-  transform: none; /* o simplemente comenta esta línea */
+  transform: none; 
   
   opacity: 0;
   transition: all 0.3s ease;
@@ -100,7 +95,6 @@ button:hover {
 
 .modal-content.show {
   opacity: 1;
-  /* transform: translateY(0); */
   transform: none;
 }
 
@@ -176,7 +170,7 @@ button:hover {
   color: #fff;
 }
 
-/* mantiene consistencia con el resto del modal */
+
 .location-buttons {
   display: flex;
   gap: 0.5rem;
@@ -252,7 +246,7 @@ button:hover {
   color:#ffffff
 }
 
-/* ---------- atributos extra ---------- */
+
 .attr-row {
   display: flex;
   gap: 0.5rem;
@@ -268,7 +262,7 @@ button:hover {
   border-radius: 4px;
 }
 
-/* Estilos para la sección de atributos */
+
 .attributes-section {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -281,7 +275,7 @@ button:hover {
   font-size: 1.1rem;
 }
 
-/* Fila de atributo */
+
 .attribute-row {
   display: flex;
   gap: 0.5rem;
@@ -307,7 +301,7 @@ button:hover {
   margin-bottom: 0;
 }
 
-/* Solo el botón de agregar atributo ocupa el 100% */
+
 .attributes-section .add-attribute-btn {
   margin-top: 0.5rem;
   width: 100%;
@@ -323,7 +317,7 @@ button:hover {
   color: #212529;
 }
 
-/* Botones de acción del modal */
+
 .modal-actions {
   margin-top: 2rem;
   padding-top: 1.5rem;

@@ -10,10 +10,7 @@ interface Props {
 const ViewModal: React.FC<Props> = ({ item, onClose }) => {
 
   useEffect(() => {
-    // Bloquea el scroll del body al montar el modal
     document.body.style.overflow = 'hidden';
-
-    // Limpia el efecto (restaura el scroll) al desmontar el modal
     return () => {
       document.body.style.overflow = '';
     };

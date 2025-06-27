@@ -1,4 +1,3 @@
-// src/components/InventoryTableUser.tsx
 import React, { useState } from 'react';
 import { FaTag } from 'react-icons/fa';
 import { InventoryItem } from '../types/InventoryItem';

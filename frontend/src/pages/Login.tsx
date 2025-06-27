@@ -91,7 +91,7 @@ const Login = () => {
 
   const handleRutChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    value = value.replace(/[^0-9kK]/g, ''); // Solo dígitos y k/K
+    value = value.replace(/[^0-9kK]/g, ''); 
     const formatted = formatRut(value);
     setRut(formatted);
   };

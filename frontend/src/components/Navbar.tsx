@@ -9,7 +9,7 @@ const Navbar = () => {
   const { user, logout } = useContext(UserContext);
 
   if (!user) {
-    return null; // No mostrar el navbar si no hay usuario autenticado
+    return null; 
   }
 
   const handleLogout = () => {
