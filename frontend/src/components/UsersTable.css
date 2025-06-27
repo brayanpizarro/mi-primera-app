@@ -1,0 +1,246 @@
+.inventory-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+  font-family: 'Myriad Pro', sans-serif;
+  
+}
+.inventory-table-title{
+    text-align: center;
+    font-size: 1.5rem;
+    color: #005EB8; /* Azul académico */
+    margin-bottom: 1rem;
+    font-family: 'Myriad Pro', sans-serif;
+}
+.inventory-table th {
+  background-color: #005EB8;
+  padding: 1rem;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+
+.inventory-table td {
+  background-color: #fff;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 1.1rem;
+
+}
+
+.inventory-table tbody tr:hover td {
+  background-color: #f1f3f5;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Imagen */
+.inventory-item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: transform 0.2s ease;
+}
+
+.inventory-item-image:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* Botones de iconos */
+.inventory-icon-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin: 0.3rem 0.3rem;
+  padding: 0.4rem 0.6rem;
+  transition: background-color 0.2s;
+}
+
+.inventory-icon-button:hover {
+  background-color: #0056b3;
+  color: #eeeeee;
+}
+
+/* Input para cantidad */
+.inventory-qty-input {
+  width: 4rem;
+  padding: 0.3rem;
+  text-align: center;
+  border: 1px solid #888;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+}
+
+/* Modo eliminar - disposición en columna */
+.inventory-delete-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inventory-delete-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+}
+.inventory-table-wrapper {
+  background-color: #f0f4f8; /* color celeste claro, puedes cambiarlo */
+  padding: 1rem;
+  border-radius: 8px;
+  min-height: 100vh; /* o el alto que necesites */
+}
+
+/* Botones de confirmación y cancelación */
+.inventory-confirm-btn,
+.inventory-cancel-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+}
+
+.inventory-confirm-btn {
+  background-color: #e92f2f;
+  color: white;
+}
+
+.inventory-confirm-btn:hover {
+  background-color: #921100;
+}
+
+.inventory-cancel-btn {
+  background-color: #ccc;
+  color: rgb(0, 0, 0);
+}
+
+.inventory-cancel-btn:hover {
+  background-color: #868e96;
+
+}
+
+/* Modal */
+.inventory-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;   /* viewport width */
+  height: 100vh;  /* viewport height */
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.inventory-modal-content {
+  position: relative;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.inventory-modal-content img {
+  max-width: 85%;
+  max-height: 80vh;
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto;
+}
+
+.inventory-modal-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: linear-gradient(to right, #2b6cb0, #3182ce); /* Azul académico */
+  color: white;
+  width: 30px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.inventory-modal-close-button:hover{
+  background: linear-gradient(to right, #1a365d, #2b6cb0); /* Oscuro al hover */
+}
+
+
+.inventory-table-background {
+  background: linear-gradient(135deg, #e3e9f7 0%, #f7fafd 100%);
+  min-height: 80vh;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+/* Estilos para atributos en la tabla */
+.attributes-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.attribute-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attribute-more {
+  background-color: #f5f5f5;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-style: italic;
+  border: 1px solid #e0e0e0;
+}
+
+.no-attributes {
+  color: #999;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.cell-with-icon {
+  position: relative;
+  vertical-align: middle;
+}
+
+.custom-attr-icon-top {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #007A33;
+  font-size: 1.3rem;
+}

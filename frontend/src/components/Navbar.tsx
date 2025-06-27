@@ -32,9 +32,14 @@ const Navbar = () => {
           Ver Inventario
         </Link>
         {isAdmin && (
-          <Link to="/register" className="navbar-item">
-            Registrar Usuario
-          </Link>
+          <>
+            <Link to="/register" className="navbar-item">
+              Registrar Usuario
+            </Link>
+            <Link to="/users" className="navbar-item">
+              Ver Usuarios
+            </Link>
+          </>
         )}
         <Link to="/editProfile" className="navbar-item">
           Editar Perfil

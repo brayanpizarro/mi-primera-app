@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { UserProvider } from './context/UserContext';
 import Navbar from './components/Navbar';
 import EditProfile from './pages/EditProfile';
+import UsersTable from './components/UsersTable';
 
 
 function AppWrapper() {
@@ -50,6 +51,12 @@ function App() {
           <Route path="/inventoryUser" element={
             <ProtectedRoute>
               <InventoryPageUser />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/users" element={
+            <ProtectedRoute requiredRole="admin">
+              <UsersTable />
             </ProtectedRoute>
           } />
 
