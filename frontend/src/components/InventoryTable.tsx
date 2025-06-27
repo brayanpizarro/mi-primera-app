@@ -1,6 +1,6 @@
 // src/components/InventoryTable.tsx
 import React, { useState } from 'react';
-import { FaEdit, FaStickyNote, FaTag, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTag, FaTrash } from 'react-icons/fa';
 import { InventoryItem } from '../types/InventoryItem';
 import imagenPredeterminada from '../Images/ImagenPredeterminadaInventario.png';
 import './InventoryTable.css';
@@ -41,7 +41,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
               className="clickable-row"
               onClick={() => onView(item.id)}          
             >
-              {/* ───── IMAGEN ───── */}
+              {/*  IMAGEN */}
               <td>
                 <img
                   src={item.imageUrl || imagenPredeterminada}
@@ -54,7 +54,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
                 />
               </td>
 
-              {/* ───── DATOS BÁSICOS ───── */}
+              {/* DATOS BÁSICOS */}
               <td>{item.name}</td>
               <td>{item.description || '-'}</td>
               <td>{item.location}</td>
@@ -63,7 +63,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
               <td>{item.status}</td>
               <td>{new Date(item.createdAt).toLocaleDateString('es-CL')}</td>
 
-              {/* ───── ACCIONES ───── */}
+              {/* ACCIONES  */}
               <td
                   className="inventory-action-cell cell-with-icon"
                   onClick={e => e.stopPropagation()}
@@ -132,7 +132,7 @@ const InventoryTable: React.FC<Props> = ({ items, onEdit, onDelete, onView }) =>
         </tbody>
       </table>
 
-      {/* ───── Modal sólo para ver la imagen ───── */}
+      {/* Modal sólo para ver la imagen */}
       {modalImage && (
         <div
           className="inventory-modal-overlay"

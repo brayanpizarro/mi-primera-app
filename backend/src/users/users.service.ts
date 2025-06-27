@@ -43,7 +43,7 @@ export class UsersService {
         throw new NotFoundException('Usuario no encontrado');
       }
 
-      // Actualizar solo los campos proporcionados
+      
       if (updateUserDto.name) {
         user.name = updateUserDto.name;
       }

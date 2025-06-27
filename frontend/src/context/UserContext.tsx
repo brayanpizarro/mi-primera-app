@@ -7,7 +7,7 @@ interface User {
   email: string;
   role: string;
   rut: string;
-  token?: string; // Añadir token al interface
+  token?: string; 
 }
 
 interface UserContextType {

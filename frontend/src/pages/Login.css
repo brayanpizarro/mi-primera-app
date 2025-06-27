@@ -1,27 +1,26 @@
-/* src/pages/Login.css */
 .login-wrapper {
   min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Cambiado a columna para logos arriba */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #4191a8 0%, #175674 100%);
   padding: 2rem;
 }
 
-/* Nuevos estilos para el contenedor de logos */
+
 .logos-container {
   display: flex;
   justify-content: center;
-  gap: 1.5rem; /* Espacio entre logos */
+  gap: 1.5rem; 
   margin-bottom: 1.5rem;
   width: 100%;
 }
 
-/* Estilos para los logos */
+
 .institution-logo {
-  height: 50px; /* Altura fija pequeña */
-  width: auto; /* Ancho automático para mantener proporción */
+  height: 50px; 
+  width: auto;
   object-fit: contain;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
 }
@@ -54,7 +53,7 @@
   font-size: 0.95rem;
 }
 
-/* Resto de tus estilos existentes... */
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -119,14 +118,14 @@
   text-align: center;
 }
 
-/* Media queries para responsive */
+
 @media (max-width: 768px) {
   .institution-logo {
-    height: 40px; /* Más pequeño en móviles */
+    height: 40px; 
   }
   
   .logos-container {
-    gap: 1rem; /* Menor espacio entre logos */
+    gap: 1rem; 
   }
 }
 
@@ -138,7 +137,7 @@
   }
   
   .institution-logo {
-    height: 35px; /* Tamaño muy pequeño para móviles muy pequeños */
+    height: 35px; 
   }
 }
 

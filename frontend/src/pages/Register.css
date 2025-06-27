@@ -1,15 +1,15 @@
-/* src/pages/Register.css */
+
 .register-wrapper {
   min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Cambiado para logos arriba */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #4191a8 0%, #175674 100%);
   padding: 2rem;
 }
 
-/* Nuevos estilos para logos (igual que login) */
+
 .logos-container {
   display: flex;
   justify-content: center;
@@ -88,7 +88,7 @@
   background-color: white;
 }
 
-/* Validación visual */
+
 .form-input:invalid:not(:placeholder-shown) {
   border-color: #f87171;
 }
@@ -143,7 +143,7 @@
   text-decoration: underline;
 }
 
-/* Botones de rol mejorados */
+
 .role-buttons-container {
   display: flex;
   gap: 0.5rem;
@@ -173,7 +173,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .institution-logo {
     height: 40px;

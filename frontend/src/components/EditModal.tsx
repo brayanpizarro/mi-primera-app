@@ -13,7 +13,7 @@ const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dxoxpcpyt/image/upload';
 const UPLOAD_PRESET  = 'InventarioECIN';
 
 const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
-  /* ---------- bloqueo de scroll del fondo ---------- */
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';   // 🔒
     return () => { document.body.style.overflow = ''; }; // 🔓 al desmontar
@@ -24,7 +24,6 @@ const EditModal: React.FC<Props> = ({ item, onChange, onSave, onCancel }) => {
   const [localFile,  setLocalFile]  = useState<File | null>(null);
   const [show, setShow] = useState(false);
 
-  /* ---- ubicaciones / estados / attrs (igual que antes) ---- */
   const [locations, setLocations] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem('locations') || '[]')
   );

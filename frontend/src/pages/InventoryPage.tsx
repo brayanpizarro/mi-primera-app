@@ -19,7 +19,7 @@ const itemsPerPage = 10;
 
 const InventoryPage = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [nextItems, setNextItems] = useState<InventoryItem[] | null>(null); // estado intermedio para data nueva
+  const [nextItems, setNextItems] = useState<InventoryItem[] | null>(null); 
   const [totalItems, setTotalItems] = useState(0);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [addingItem, setAddingItem] = useState(false);
@@ -58,14 +58,14 @@ const InventoryPage = () => {
       sortDirection.toUpperCase() as 'ASC' | 'DESC'
     )
       .then(res => {
-        setNextItems(res.data.data); // guardamos la nueva data acá
+        setNextItems(res.data.data); 
         setTotalItems(res.data.total);
       })
       .catch(err => console.error('Error al cargar inventario:', err))
       .finally(() => setLoading(false));
   }, [currentPage, searchQuery, sortField, sortDirection, selectedLocation, selectedStatus]);
 
-  // Actualizamos items solo cuando nextItems cambia (data nueva lista)
+ 
   useEffect(() => {
     if (nextItems) {
       setItems(nextItems);
@@ -73,7 +73,7 @@ const InventoryPage = () => {
     }
   }, [nextItems]);
 
-  // Solo resetea página si no es 1, para evitar doble carga
+
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
