@@ -30,6 +30,16 @@ export declare class UsersService {
         updatedAt: Date;
         deletedAt: Date;
     }>;
+    updateByEmail(email: string, updateUserDto: UpdateUserDto): Promise<{
+        id: number;
+        name: string;
+        rut: string;
+        email: string;
+        role: import("./entities/user-role.enum").UserRole;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date;
+    }>;
     remove(id: number): Promise<import("typeorm").UpdateResult>;
     removeByRut(rut: string): Promise<import("typeorm").UpdateResult>;
 }

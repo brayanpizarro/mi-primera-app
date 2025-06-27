@@ -88,10 +88,13 @@ export class AuthService {
         
         // If user doesn't exist, create a new one
         if (!user) {
+            const randomPassword = Math.random().toString(36).slice(-8); // Generate random password
+            const passwordHash = await bcryptjs.hash(randomPassword, 10); // Encriptar la contraseña
+            
             const newUser = {
                 email,
                 name: `${firstName} ${lastName}`,
-                password: Math.random().toString(36).slice(-8), // Generate random password
+                password: passwordHash, // Usar la contraseña encriptada
                 role: UserRole.USER, // Default role
                 rut: '0-0', // Default RUT for Google users
             };

@@ -62,6 +62,18 @@ let UsersController = class UsersController {
     removeByRut(rut) {
         return this.usersService.removeByRut(rut);
     }
+    async updateByEmail(email, updateUserDto) {
+        try {
+            return await this.usersService.updateByEmail(email, updateUserDto);
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: 'Error al actualizar usuario',
+                details: error.message
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -116,6 +128,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "removeByRut", null);
+__decorate([
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    (0, common_1.Patch)('by-email/:email'),
+    __param(0, (0, common_1.Param)('email')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateByEmail", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

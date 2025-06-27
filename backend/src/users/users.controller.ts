@@ -75,4 +75,21 @@ export class UsersController {
   removeByRut(@Param('rut') rut: string) {
     return this.usersService.removeByRut(rut);
   }
+
+  @UseGuards(AuthGuard)
+  @Patch('by-email/:email')
+  async updateByEmail(
+    @Param('email') email: string,
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    try {
+      return await this.usersService.updateByEmail(email, updateUserDto);
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: 'Error al actualizar usuario',
+        details: error.message
+      }, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

@@ -86,6 +86,44 @@ let UsersService = class UsersService {
         const { password, ...result } = updatedUser;
         return result;
     }
+    async updateByEmail(email, updateUserDto) {
+        const user = await this.userRepository.findOne({
+            where: { email },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException(`Usuario con email ${email} no encontrado`);
+        }
+        if (updateUserDto.name) {
+            user.name = updateUserDto.name;
+        }
+        if (updateUserDto.rut && updateUserDto.rut !== '0-0') {
+            const existingUser = await this.userRepository.findOne({
+                where: { rut: updateUserDto.rut },
+            });
+            if (existingUser && existingUser.email !== email) {
+                throw new common_1.BadRequestException('El RUT ya está registrado por otro usuario');
+            }
+            user.rut = updateUserDto.rut;
+        }
+        if (updateUserDto.newPassword) {
+            if (user.rut === '0-0' || user.email.endsWith('@gmail.com')) {
+                user.password = await bcrypt.hash(updateUserDto.newPassword, 10);
+            }
+            else {
+                if (!updateUserDto.currentPassword) {
+                    throw new common_1.BadRequestException('Se requiere la contraseña actual para cambiarla');
+                }
+                const isPasswordValid = await bcrypt.compare(updateUserDto.currentPassword, user.password);
+                if (!isPasswordValid) {
+                    throw new common_1.BadRequestException('Contraseña actual incorrecta');
+                }
+                user.password = await bcrypt.hash(updateUserDto.newPassword, 10);
+            }
+        }
+        const updatedUser = await this.userRepository.save(user);
+        const { password, ...result } = updatedUser;
+        return result;
+    }
     async remove(id) {
         return await this.userRepository.softDelete(id);
     }

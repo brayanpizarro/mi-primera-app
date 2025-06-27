@@ -4,4 +4,5 @@ export declare class UpdateUserDto {
     currentPassword?: string;
     newPassword?: string;
     role?: UserRole;
+    rut?: string;
 }

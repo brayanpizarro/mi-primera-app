@@ -66,10 +66,12 @@ let AuthService = class AuthService {
         const { email, firstName, lastName, picture } = req.user;
         let user = await this.usersService.findOneByEmail(email);
         if (!user) {
+            const randomPassword = Math.random().toString(36).slice(-8);
+            const passwordHash = await bcryptjs.hash(randomPassword, 10);
             const newUser = {
                 email,
                 name: `${firstName} ${lastName}`,
-                password: Math.random().toString(36).slice(-8),
+                password: passwordHash,
                 role: user_role_enum_1.UserRole.USER,
                 rut: '0-0',
             };

@@ -17,6 +17,7 @@ class UpdateUserDto {
     currentPassword;
     newPassword;
     role;
+    rut;
 }
 exports.UpdateUserDto = UpdateUserDto;
 __decorate([
@@ -42,4 +43,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "role", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Matches)(/^(\d{1,2}\.?\d{3}\.?\d{3}-[\dkK])$/, {
+        message: 'El RUT debe tener un formato válido (Ej: 12.345.678-9)',
+    }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "rut", void 0);
 //# sourceMappingURL=update-user.dto.js.map
