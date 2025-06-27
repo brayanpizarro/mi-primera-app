@@ -232,3 +232,16 @@
   font-style: italic;
   font-size: 0.85rem;
 }
+
+.cell-with-icon {
+  position: relative;
+  vertical-align: middle;
+}
+
+.custom-attr-icon-top {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  color: #00aaff;
+  font-size: 1.5rem;
+}
