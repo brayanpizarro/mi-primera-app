@@ -104,4 +104,7 @@ export class UsersService {
   async remove(id: number) {
     return await this.userRepository.softDelete(id);
   }
+  async removeByRut(rut: string) {
+    return await this.userRepository.softDelete({rut});
+  }
 }

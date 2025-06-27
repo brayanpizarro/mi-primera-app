@@ -89,6 +89,9 @@ let UsersService = class UsersService {
     async remove(id) {
         return await this.userRepository.softDelete(id);
     }
+    async removeByRut(rut) {
+        return await this.userRepository.softDelete({ rut });
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

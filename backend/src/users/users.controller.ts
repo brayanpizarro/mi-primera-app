@@ -69,4 +69,10 @@ export class UsersController {
       }, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @UseGuards(AuthGuard)
+  @Delete('by-rut/:rut')
+  removeByRut(@Param('rut') rut: string) {
+    return this.usersService.removeByRut(rut);
+  }
 }

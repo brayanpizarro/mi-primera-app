@@ -31,4 +31,5 @@ export declare class UsersService {
         deletedAt: Date;
     }>;
     remove(id: number): Promise<import("typeorm").UpdateResult>;
+    removeByRut(rut: string): Promise<import("typeorm").UpdateResult>;
 }

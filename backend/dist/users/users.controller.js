@@ -59,6 +59,9 @@ let UsersController = class UsersController {
             }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
+    removeByRut(rut) {
+        return this.usersService.removeByRut(rut);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -105,6 +108,13 @@ __decorate([
     __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateByRut", null);
+__decorate([
+    (0, common_1.Delete)('by-rut/:rut'),
+    __param(0, (0, common_1.Param)('rut')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "removeByRut", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

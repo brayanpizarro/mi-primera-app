@@ -28,4 +28,5 @@ export declare class UsersController {
         updatedAt: Date;
         deletedAt: Date;
     }>;
+    removeByRut(rut: string): Promise<import("typeorm").UpdateResult>;
 }
